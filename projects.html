@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="has-side-nav">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><i class="fas fa-chess-pawn"></i> Wanjohi</a>
+            <ul class="nav-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="projects.html" class="active">Projects</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main> <!-- Wrap main content -->
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-info">
+                    <h1>My Projects</h1>
+                    <p>Showcasing my latest work and creations.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <h2>My Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>Ring Africa Consultation Platform</h3>
+                    <p>2025 - Recruited by Ring Africa Recruitment team...</p>
+                    <button class="see-more-button">See More</button>
+                    <div class="project-details">
+                        <p>Recruited by Ring Africa Recruitment team to develop, design and implement a consultation platform for their clients,I embarked on the exciting journey to develop the consultation platform that the company really enjoyed and is currently actively still using to receive consultation messages.</p>
+                        <div class="project-gallery">
+                            <img src="./images/ringafricaprojecthome.png" alt="Home page">
+                            <img src="./images/ringafricaprojectabout.png" alt="About page">
+                            <img src="./images/ringafricaprojectcontact.png" alt="Contact page">
+                            <img src="./images/ringafricaprojectservices.png" alt="Services page">
+                            <img src="./images/ringafricaprojectmoreinfo.png" alt="More detail">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Wanjohi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- Image Modal Structure -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div id="caption"></div>
+    </div>
+
+</body>
+</html> 

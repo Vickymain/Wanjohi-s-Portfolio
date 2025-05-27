@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Wanjohi's Chess Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><i class="fas fa-chess-pawn"></i> Wanjohi</a>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+    
+    <main> <!-- Wrap main content -->
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-info">
+                    <h1>Wanjohi</h1>
+                    <p>Chess Enthusiast & Developer</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <h2>My Portfolio</h2>
+            <p>My name is Victor Maina Wanjohi.</p>
+            <p>Welcome to my chess-themed portfolio where creativity meets intention</p>
+        </div>
+
+        <!-- Chess Board Section -->
+        <div class="container">
+            <div class="chess-board-section">
+                <h2 class="chess-intro">Can we start by playing a game of chess?</h2>
+                <div class="chess-board" id="chessBoard">
+                    <div class="board-row" data-row="0">
+                        <div class="board-square white" data-col="0"><i class="fas fa-chess-rook black-piece" data-piece="rook" data-color="black"></i></div>
+                        <div class="board-square black" data-col="1"><i class="fas fa-chess-knight black-piece" data-piece="knight" data-color="black"></i></div>
+                        <div class="board-square white" data-col="2"><i class="fas fa-chess-bishop black-piece" data-piece="bishop" data-color="black"></i></div>
+                        <div class="board-square black" data-col="3"><i class="fas fa-chess-queen black-piece" data-piece="queen" data-color="black"></i></div>
+                        <div class="board-square white" data-col="4"><i class="fas fa-chess-king black-piece" data-piece="king" data-color="black"></i></div>
+                        <div class="board-square black" data-col="5"><i class="fas fa-chess-bishop black-piece" data-piece="bishop" data-color="black"></i></div>
+                        <div class="board-square white" data-col="6"><i class="fas fa-chess-knight black-piece" data-piece="knight" data-color="black"></i></div>
+                        <div class="board-square black" data-col="7"><i class="fas fa-chess-rook black-piece" data-piece="rook" data-color="black"></i></div>
+                    </div>
+                    <div class="board-row" data-row="1">
+                        <div class="board-square black" data-col="0"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square white" data-col="1"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square black" data-col="2"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square white" data-col="3"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square black" data-col="4"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square white" data-col="5"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square black" data-col="6"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                        <div class="board-square white" data-col="7"><i class="fas fa-chess-pawn black-piece" data-piece="pawn" data-color="black"></i></div>
+                    </div>
+                    <div class="board-row" data-row="2">
+                        <div class="board-square white" data-col="0"></div>
+                        <div class="board-square black" data-col="1"></div>
+                        <div class="board-square white" data-col="2"></div>
+                        <div class="board-square black" data-col="3"></div>
+                        <div class="board-square white" data-col="4"></div>
+                        <div class="board-square black" data-col="5"></div>
+                        <div class="board-square white" data-col="6"></div>
+                        <div class="board-square black" data-col="7"></div>
+                    </div>
+                    <div class="board-row" data-row="3">
+                        <div class="board-square black" data-col="0"></div>
+                        <div class="board-square white" data-col="1"></div>
+                        <div class="board-square black" data-col="2"></div>
+                        <div class="board-square white" data-col="3"></div>
+                        <div class="board-square black" data-col="4"></div>
+                        <div class="board-square white" data-col="5"></div>
+                        <div class="board-square black" data-col="6"></div>
+                        <div class="board-square white" data-col="7"></div>
+                    </div>
+                    <div class="board-row" data-row="4">
+                        <div class="board-square white" data-col="0"></div>
+                        <div class="board-square black" data-col="1"></div>
+                        <div class="board-square white" data-col="2"></div>
+                        <div class="board-square black" data-col="3"></div>
+                        <div class="board-square white" data-col="4"></div>
+                        <div class="board-square black" data-col="5"></div>
+                        <div class="board-square white" data-col="6"></div>
+                        <div class="board-square black" data-col="7"></div>
+                    </div>
+                    <div class="board-row" data-row="5">
+                        <div class="board-square black" data-col="0"></div>
+                        <div class="board-square white" data-col="1"></div>
+                        <div class="board-square black" data-col="2"></div>
+                        <div class="board-square white" data-col="3"></div>
+                        <div class="board-square black" data-col="4"></div>
+                        <div class="board-square white" data-col="5"></div>
+                        <div class="board-square black" data-col="6"></div>
+                        <div class="board-square white" data-col="7"></div>
+                    </div>
+                    <div class="board-row" data-row="6">
+                        <div class="board-square white" data-col="0"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square black" data-col="1"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square white" data-col="2"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square black" data-col="3"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square white" data-col="4"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square black" data-col="5"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square white" data-col="6"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                        <div class="board-square black" data-col="7"><i class="fas fa-chess-pawn white-piece" data-piece="pawn" data-color="white"></i></div>
+                    </div>
+                    <div class="board-row" data-row="7">
+                        <div class="board-square black" data-col="0"><i class="fas fa-chess-rook white-piece" data-piece="rook" data-color="white"></i></div>
+                        <div class="board-square white" data-col="1"><i class="fas fa-chess-knight white-piece" data-piece="knight" data-color="white"></i></div>
+                        <div class="board-square black" data-col="2"><i class="fas fa-chess-bishop white-piece" data-piece="bishop" data-color="white"></i></div>
+                        <div class="board-square white" data-col="3"><i class="fas fa-chess-queen white-piece" data-piece="queen" data-color="white"></i></div>
+                        <div class="board-square black" data-col="4"><i class="fas fa-chess-king white-piece" data-piece="king" data-color="white"></i></div>
+                        <div class="board-square white" data-col="5"><i class="fas fa-chess-bishop white-piece" data-piece="bishop" data-color="white"></i></div>
+                        <div class="board-square black" data-col="6"><i class="fas fa-chess-knight white-piece" data-piece="knight" data-color="white"></i></div>
+                        <div class="board-square white" data-col="7"><i class="fas fa-chess-rook white-piece" data-piece="rook" data-color="white"></i></div>
+                    </div>
+                </div>
+                <div class="chess-cta">
+                    <a href="https://www.chess.com/member/vickymain" target="_blank" class="play-chess-button">
+                        <i class="fas fa-chess-knight"></i> Let's Play Chess
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explore Work Section -->
+        <div class="container">
+            <div class="explore-section">
+                <h2 class="explore-intro">Ready to see what I can do?</h2>
+                <p class="explore-text"></p>
+                <div class="explore-cta">
+                    <a href="projects.html" class="cta-button">Explore My Work</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Wanjohi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

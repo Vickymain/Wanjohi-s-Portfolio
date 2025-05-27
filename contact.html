@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("fTVExPiFQKWyVMH4A");
+        })();
+    </script>
+    <style>
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .error-message {
+            color: #ff3333;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: block;
+        }
+
+        input:invalid,
+        textarea:invalid,
+        input.is-invalid,
+        textarea.is-invalid {
+            border-color: #ff3333 !important;
+        }
+
+        input[type="email"].is-invalid {
+             border-color: #ff3333 !important;
+        }
+
+        input:valid,
+        textarea:valid,
+        input:not(.is-invalid):valid,
+        textarea:not(.is-invalid):valid {
+            border-color: #00cc00;
+        }
+
+        /* Styles for the message display area (kept for errors) */
+        .form-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+
+        .form-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Styles for the Success Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* Hidden by default */
+            justify-content: center; /* Center modal content horizontally */
+            align-items: center; /* Center modal content vertically */
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px; /* Limit modal width */
+            width: 90%;
+        }
+
+        .success-icon {
+            font-size: 3rem; /* Larger icon */
+            color: green; /* Green color for success */
+            border: 3px solid green; /* Green border */
+            border-radius: 50%; /* Make it round */
+            padding: 1rem; /* Space inside the circle */
+            display: inline-block; /* Needed for padding and border */
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .modal-close-button:hover {
+            background-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body class="has-side-nav">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><i class="fas fa-chess-pawn"></i> Wanjohi</a>
+            <ul class="nav-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main> <!-- Wrap main content -->
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-info">
+                    <h1>Get in Touch</h1>
+                    <p>Reach out to collaborate or just say hello.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <h2>Get in Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <a href="mailto:wanjohi.vmaina@gmail.com">
+                            <i class="fas fa-envelope"></i>
+                            <p>wanjohi.vmaina@gmail.com</p>
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <a href="tel:+254796139729">
+                            <i class="fas fa-phone"></i>
+                            <p>+254 796139729</p>
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <a href="https://github.com/Vickymain" target="_blank">
+                            <i class="fab fa-github"></i>
+                            <p>GitHub</p>
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <a href="https://www.linkedin.com/in/maina-wanjohi-733624303/" target="_blank">
+                            <i class="fab fa-linkedin"></i>
+                            <p>LinkedIn</p>
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <a href="https://www.chess.com/member/vickymain" target="_blank">
+                            <i class="fas fa-chess-knight"></i>
+                            <p>Chess.com</p>
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <a href="https://www.instagram.com/rqxwnc?igsh=NnRncWQ0aXB1bTBo" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                            <p>Instagram</p>
+                        </a>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/maina-wanjohi-733624303/" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/Vickymain" class="social-link" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="https://www.chess.com/member/vickymain" class="social-link" target="_blank"><i class="fas fa-chess-knight"></i></a>
+                    </div>
+                </div>
+                <form class="contact-form" id="contact-form" novalidate>
+                    <div id="form-message" class="form-message"></div>
+                    <div class="form-group">
+                        <input type="text" name="user_name" id="user_name" placeholder="Your Name" required minlength="2">
+                        <span class="error-message" id="name-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="user_email" id="user_email" placeholder="Your Email" required>
+                        <span class="error-message" id="email-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="user_phone" id="user_phone" placeholder="Your Phone Number" required pattern="[0-9]{10}">
+                        <span class="error-message" id="phone-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" id="message" placeholder="Your Message" required minlength="15"></textarea>
+                        <span class="error-message" id="message-error"></span>
+                    </div>
+                    <button type="submit" class="submit-button">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Wanjohi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <i class="fas fa-chess-pawn success-icon"></i>
+            <p class="success-message">Thank you for your message! I will get back to you soon.</p>
+            <button class="modal-close-button">OK</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Reset all error messages and hide message area
+            document.querySelectorAll('.error-message').forEach(error => error.textContent = '');
+            document.getElementById('form-message').style.display = 'none'; // Hide the old message area
+            
+            // Get form fields
+            const name = document.getElementById('user_name');
+            const email = document.getElementById('user_email');
+            const phone = document.getElementById('user_phone');
+            const message = document.getElementById('message');
+            
+            let isValid = true;
+            
+            // Validate name
+            if (name.value.trim() === '') {
+                document.getElementById('name-error').textContent = 'Name is required';
+                name.classList.add('is-invalid');
+                isValid = false;
+            } else if (name.value.trim().length < 2) {
+                document.getElementById('name-error').textContent = 'Please enter a valid name (at least 2 characters)';
+                name.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('name-error').textContent = ''; // Clear error on pass
+                name.classList.remove('is-invalid');
+            }
+            
+            // Validate email
+            const emailRegex = /^[^\s@]+@gmail\.com$/;
+            if (email.value.trim() === '') {
+                document.getElementById('email-error').textContent = 'Email is required';
+                email.classList.add('is-invalid');
+                isValid = false;
+            } else if (!emailRegex.test(email.value)) {
+                 console.log('Email validation failed');
+                 document.getElementById('email-error').textContent = 'Please enter a valid @gmail.com email address';
+                 email.classList.add('is-invalid');
+                 isValid = false;
+             } else {
+                 document.getElementById('email-error').textContent = ''; // Clear error on pass
+                 email.classList.remove('is-invalid');
+             }
+            
+            // Validate phone
+            const phoneRegex = /^[0-9]{10}$/;
+            if (phone.value.trim() === '') {
+                document.getElementById('phone-error').textContent = 'Phone number is required';
+                phone.classList.add('is-invalid');
+                isValid = false;
+            } else if (!phoneRegex.test(phone.value)) {
+                document.getElementById('phone-error').textContent = 'Please enter a valid 10-digit phone number';
+                phone.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('phone-error').textContent = ''; // Clear error on pass
+                phone.classList.remove('is-invalid');
+            }
+            
+            // Validate message
+            if (message.value.trim() === '') {
+                document.getElementById('message-error').textContent = 'Message is required';
+                message.classList.add('is-invalid');
+                isValid = false;
+            } else if (message.value.trim().length < 15) {
+                document.getElementById('message-error').textContent = 'Please enter a message with at least 15 characters';
+                message.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('message-error').textContent = ''; // Clear error on pass
+                message.classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                return;
+            }
+
+            // Show loading state
+            const submitButton = this.querySelector('.submit-button');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+
+            // Send email using EmailJS
+            console.log('Attempting to send email...'); // Added console log before sending
+            emailjs.sendForm('service_ef48g6q', 'template_zu6hbxe', this)
+                .then(function() {
+                    console.log('Email sent successfully!'); // Added console log on success
+                    // Use modal for success
+                    showSuccessModal();
+                    document.getElementById('contact-form').reset();
+                     // You might want to clear validation classes too after reset
+                     document.querySelectorAll('.form-group input, .form-group textarea').forEach(field => {
+                        field.classList.remove('is-invalid');
+                        // Depending on your validation logic, you might need to remove valid classes too
+                        // field.classList.remove('is-valid');
+                         // Also explicitly clear browser validation state
+                         field.setCustomValidity('');
+                     });
+
+                }, function(error) {
+                    console.error('Email sending failed:', error); // Added console log on error
+                    // Use old message display for errors
+                    displayMessage('Failed to send message. Please try again.', 'error');
+                    console.error('EmailJS error:', error);
+                })
+                .finally(function() {
+                    // Reset button state
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                });
+
+            return false; // Explicitly return false to prevent default submission
+        });
+
+        // Function to display messages (kept for errors for now)
+        function displayMessage(message, type) {
+            const messageDiv = document.getElementById('form-message');
+            messageDiv.textContent = message;
+            messageDiv.className = 'form-message'; // Reset classes
+            messageDiv.classList.add(type); // Add success or error class
+            messageDiv.style.display = 'block'; // Make the message visible
+
+            // Hide message after a few seconds (optional, but good for non-modal messages)
+            if (type === 'success') {
+                 // Removed auto-hide for the old success message
+            }
+        }
+
+        // Function to show success modal
+        function showSuccessModal() {
+            console.log('Attempting to show success modal'); // Added console log
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'flex'; // Use flex to center content horizontally
+        }
+
+        // Function to hide modal
+        function hideSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'none';
+        }
+
+        // Add event listener to close modal
+        document.getElementById('success-modal').addEventListener('click', function(event) {
+            // Close modal if clicking on the overlay or the close button/OK button
+            if (event.target === this || event.target.classList.contains('modal-close-button')) {
+                hideSuccessModal();
+            }
+        });
+
+        // Real-time validation for phone number
+        document.getElementById('user_phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+            // Re-run phone validation on input
+            const phoneRegex = /^[0-9]{10}$/;
+            const phoneError = document.getElementById('phone-error');
+            if (!phoneRegex.test(this.value)) {
+                phoneError.textContent = 'Please enter a valid 10-digit phone number';
+                this.classList.add('is-invalid');
+            } else {
+                phoneError.textContent = '';
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        // Add real-time validation for other fields on input/change
+        document.getElementById('user_name').addEventListener('input', function() {
+            const nameError = document.getElementById('name-error');
+            if (this.value.trim().length < 2) {
+                nameError.textContent = 'Please enter a valid name (at least 2 characters)';
+                this.classList.add('is-invalid');
+            } else {
+                nameError.textContent = '';
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        document.getElementById('user_email').addEventListener('input', function() {
+             const emailRegex = /^[^\s@]+@gmail\.com$/;
+             const emailError = document.getElementById('email-error');
+             if (!emailRegex.test(this.value)) {
+                 console.log('Email validation failed');
+                 emailError.textContent = 'Please enter a valid @gmail.com email address';
+                 this.classList.add('is-invalid');
+             } else {
+                 emailError.textContent = '';
+                 this.classList.remove('is-invalid');
+             }
+        });
+
+        document.getElementById('message').addEventListener('input', function() {
+            const messageError = document.getElementById('message-error');
+            if (this.value.trim() === '') {
+                messageError.textContent = 'Message is required';
+                this.classList.add('is-invalid');
+            } else if (this.value.trim().length < 15) {
+                messageError.textContent = 'Please enter a message with at least 15 characters';
+                this.classList.add('is-invalid');
+            } else {
+                messageError.textContent = '';
+                this.classList.remove('is-invalid');
+            }
+            updateSubmitButtonState(); // Call to update button state
+        });
+
+        // Function to check form validity and update submit button state
+        function updateSubmitButtonState() {
+            const name = document.getElementById('user_name');
+            const email = document.getElementById('user_email');
+            const phone = document.getElementById('user_phone');
+            const message = document.getElementById('message');
+            const submitButton = document.querySelector('.submit-button');
+
+            let allFieldsValid = true;
+
+            // Check Name validity
+            if (name.value.trim() === '' || name.value.trim().length < 2) {
+                allFieldsValid = false;
+            }
+
+            // Check Email validity
+            const emailRegex = /^[^\s@]+@gmail\.com$/;
+            if (email.value.trim() === '' || !emailRegex.test(email.value)) {
+                allFieldsValid = false;
+            }
+
+            // Check Phone validity
+            const phoneRegex = /^[0-9]{10}$/;
+            if (phone.value.trim() === '' || !phoneRegex.test(phone.value)) {
+                allFieldsValid = false;
+            }
+
+            // Check Message validity
+            if (message.value.trim() === '' || message.value.trim().length < 15) {
+                allFieldsValid = false;
+            }
+
+            // Enable or disable the submit button based on validity
+            submitButton.disabled = !allFieldsValid;
+        }
+
+        // Initial check when the page loads
+        document.addEventListener('DOMContentLoaded', updateSubmitButtonState);
+
+        // Also update state when any relevant input changes (already handled by individual listeners, but adding a general one for robustness)
+        const formInputs = document.querySelectorAll('#contact-form input, #contact-form textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', updateSubmitButtonState);
+            input.addEventListener('change', updateSubmitButtonState); // Also listen for change
+        });
+
+    </script>
+</body>
+</html> 

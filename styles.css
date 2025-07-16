@@ -279,7 +279,7 @@ main {
 /* Projects Page Specific Styles */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr;
     gap: 2rem;
     margin-top: 2rem;
 }
@@ -860,4 +860,100 @@ main {
     .explore-text {
         font-size: 1.1rem;
     }
+} 
+
+@media (max-width: 600px) {
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .project-card {
+    margin: 0 auto;
+    width: 95%;
+    padding: 1.2rem;
+  }
+}
+
+/* Mobile grid for chess pieces on index.html */
+@media (max-width: 600px) {
+  .chess-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+    width: 98%;
+    max-width: 400px;
+    height: auto;
+    position: static;
+    margin: 0 auto 1.5rem auto;
+  }
+  .intro-piece {
+    position: static !important;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .intro-piece img {
+    width: 90px;
+    max-width: 100%;
+  }
+  .piece-label {
+    font-size: 1rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .homepage-text h1 {
+    font-size: 1.3rem;
+  }
+  .homepage-text p {
+    font-size: 0.95rem;
+  }
+} 
+
+@media (max-width: 600px) {
+  .about-content,
+  .contact-content,
+  .skills-grid,
+  .personal-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    padding: 0.5rem !important;
+  }
+  .developer-content {
+    flex-direction: column-reverse !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    padding: 0.5rem !important;
+  }
+  .about-page-image,
+  .developer-page-image {
+    width: 90% !important;
+    margin-bottom: 1rem !important;
+  }
+  .skill-card,
+  .contact-info,
+  .contact-form {
+    width: 100% !important;
+    min-width: unset !important;
+    margin: 0.5rem 0 !important;
+  }
+  .skills-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .container h2,
+  .hero-info h1 {
+    font-size: 1.5rem !important;
+  }
+  .container p,
+  .hero-info p {
+    font-size: 1rem !important;
+  }
+  .login-form,
+  .personal-info {
+    width: 100% !important;
+    margin: 0.5rem 0 !important;
+  }
 } 

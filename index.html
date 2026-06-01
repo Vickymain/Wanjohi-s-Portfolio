@@ -1,73 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wanjohi's Chess Portfolio</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victor Maina</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0c; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
+  #chess-root { width: 100%; height: 100vh; position: relative; overflow: hidden; }
+  #chess-canvas { width: 100%; height: 100%; display: block; }
+  #header { position: absolute; top: 20px; left: 24px; z-index: 10; pointer-events: none; }
+  #header h1 { font-size: 24px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.05em; }
+  #header h1 span { color: #4ade80; }
+  #header p { font-size: 11px; color: #4ade80; letter-spacing: 0.15em; margin-top: 4px; opacity: 0.6; }
+  #hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #4ade80; letter-spacing: 0.12em; opacity: 0.45; pointer-events: none; text-align: center; }
+  #tooltip { position: absolute; pointer-events: none; z-index: 20; background: #0a0a0c; border: 1px solid #4ade80; padding: 5px 12px; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; display: none; white-space: nowrap; }
+  #piece-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 15; text-align: center; display: none; }
+  #piece-label .pname { font-size: 32px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.08em; text-shadow: 0 0 30px rgba(74,222,128,0.5); }
+  #piece-label .psub { font-size: 11px; color: #4ade80; letter-spacing: 0.2em; margin-top: 8px; opacity: 0.7; }
+  #piece-label .pclick { font-size: 10px; color: #4ade8088; letter-spacing: 0.15em; margin-top: 4px; }
+
+  #overlay { position: absolute; inset: 0; z-index: 30; display: none; background: #0a0a0c; overflow-y: auto; }
+  #overlay.active { display: flex; flex-direction: column; }
+  .page-bg { position: absolute; inset: 0; opacity: 0.04; font-size: 300px; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; user-select: none; line-height: 1; }
+  .page-content { position: relative; z-index: 2; padding: 32px 40px; flex: 1; max-width: 900px; }
+  .page-back { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: #4ade80; letter-spacing: 0.15em; cursor: pointer; border: 1px solid #4ade8055; padding: 6px 14px; margin-bottom: 32px; background: transparent; font-family: 'Courier New', monospace; transition: background 0.2s, border-color 0.2s; }
+  .page-back:hover { background: rgba(74,222,128,0.08); border-color: #4ade80; }
+  .page-title { font-size: 28px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; letter-spacing: 0.04em; }
+  .page-title span { color: #4ade80; }
+  .page-rule { border: none; border-top: 1px solid #4ade8030; margin-bottom: 28px; }
+  .terminal-block { background: #0e0e12; border: 1px solid #1e1e26; padding: 24px; font-size: 13px; color: #c8c8c0; line-height: 1.9; margin-bottom: 20px; border-radius: 2px; }
+  .terminal-block .prompt { color: #4ade80; margin-right: 8px; }
+  .terminal-block .comment { color: #3a3a4a; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .project-card { background: #0e0e12; border: 1px solid #1e1e26; padding: 18px; transition: border-color 0.2s; border-radius: 2px; cursor: default; }
+  .project-card:hover { border-color: #4ade8066; }
+  .project-card .pc-icon { font-size: 22px; margin-bottom: 10px; }
+  .project-card .pc-title { font-size: 13px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; }
+  .project-card .pc-desc { font-size: 12px; color: #666; line-height: 1.6; }
+  .project-card .pc-tag { display: inline-block; font-size: 10px; color: #4ade80; border: 1px solid #4ade8033; padding: 2px 7px; margin-top: 10px; letter-spacing: 0.1em; }
+  .list-items { list-style: none; }
+  .list-items li { padding: 9px 0; border-bottom: 1px solid #141418; font-size: 13px; color: #c8c8c0; display: flex; align-items: baseline; gap: 10px; }
+  .list-items li::before { content: '—'; color: #4ade80; flex-shrink: 0; }
+  .exp-item { margin-bottom: 20px; padding-left: 16px; border-left: 2px solid #4ade8030; }
+  .exp-item .role { font-size: 14px; color: #e8e8e0; font-weight: 700; }
+  .exp-item .org { font-size: 11px; color: #4ade80; letter-spacing: 0.12em; margin: 4px 0; }
+  .exp-item .note { font-size: 12px; color: #555; }
+  .contact-row { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid #141418; }
+  .contact-row .cr-label { font-size: 11px; color: #4ade80; letter-spacing: 0.14em; min-width: 80px; }
+  .contact-row .cr-val { font-size: 13px; color: #c8c8c0; }
+  .uses-section { margin-bottom: 16px; }
+  .uses-section .us-cat { font-size: 11px; color: #4ade80; letter-spacing: 0.16em; margin-bottom: 6px; }
+</style>
 </head>
 <body>
-    <div class="homepage-content-wrapper">
-    <div class="chess-intro custom-mobile-chess-layout">
-        <div class="chess-mobile-grid">
-            <div class="chess-mobile-cell king-cell">
-                <div class="intro-piece king" data-section="home">
-                    <a href="home.html">
-                        <img src="./images/king.png" alt="King">
-                        <span class="piece-label">Home</span>
-                    </a>
-                </div>
-            </div>
-            <div class="chess-mobile-cell queen-cell">
-                <div class="intro-piece queen" data-section="skills">
-                    <a href="skills.html">
-                        <img src="./images/queen.png" alt="Queen">
-                        <span class="piece-label">Skills</span>
-                    </a>
-                </div>
-            </div>
-            <div class="chess-mobile-cell knight-cell">
-                <div class="intro-piece knight" data-section="projects">
-                    <a href="projects.html">
-                        <img src="./images/knight.png" alt="Knight">
-                        <span class="piece-label">Projects</span>
-                    </a>
-                </div>
-            </div>
-            <div class="chess-mobile-cell rook-cell">
-                <div class="intro-piece rook" data-section="about">
-                    <a href="about.html">
-                        <img src="./images/rook.png" alt="Rook">
-                        <span class="piece-label">About</span>
-                    </a>
-                </div>
-            </div>
-            <div class="chess-mobile-cell bishop-cell">
-                <div class="intro-piece bishop" data-section="contact">
-                    <a href="contact.html">
-                        <img src="./images/bishop.png" alt="Bishop">
-                        <span class="piece-label">Contact</span>
-                    </a>
-                </div>
-            </div>
+<div id="chess-root">
+  <div id="header">
+    <h1>Victor<span>_</span>Maina<span style="animation: blink 1.2s step-end infinite; display:inline-block">_</span></h1>
+    <p>// SELECT A PIECE TO NAVIGATE</p>
+  </div>
+  <canvas id="chess-canvas"></canvas>
+  <div id="hint">DRAG TO ROTATE &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; CLICK PIECE → SELECT &nbsp;·&nbsp; CLICK AGAIN → OPEN</div>
+  <div id="tooltip"></div>
+  <div id="piece-label">
+    <div class="pname" id="pl-name"></div>
+    <div class="psub" id="pl-sub"></div>
+    <div class="pclick">CLICK AGAIN TO OPEN →</div>
+  </div>
+  <div id="overlay">
+    <div class="page-bg" id="page-bg-icon"></div>
+    <div class="page-content">
+      <button class="page-back" id="back-btn">← BACK TO BOARD</button>
+      <div id="page-inner"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const PIECES_DATA = [
+  { id:'king',   label:'ABOUT ME',    pos:[3,0], color:'white', page:'about'    },
+  { id:'queen',  label:'SKILLS',      pos:[4,0], color:'white', page:'skills'   },
+  { id:'bishop1',label:'PROJECTS',    pos:[2,0], color:'white', page:'projects' },
+  { id:'bishop2',label:'OPEN SOURCE', pos:[5,0], color:'white', page:'open'     },
+  { id:'knight1',label:'EXPERIENCE',  pos:[1,0], color:'white', page:'exp'      },
+  { id:'knight2',label:'USES',        pos:[6,0], color:'white', page:'uses'     },
+  { id:'rook1',  label:'BLOG',        pos:[0,0], color:'white', page:'blog'     },
+  { id:'rook2',  label:'CONTACT',     pos:[7,0], color:'white', page:'contact'  },
+  { id:'pawn0',  label:'PROJECTS',    pos:[0,1], color:'black', page:'projects' },
+  { id:'pawn1',  label:'BLOG',        pos:[1,1], color:'black', page:'blog'     },
+  { id:'pawn2',  label:'SKILLS',      pos:[2,1], color:'black', page:'skills'   },
+  { id:'pawn3',  label:'ABOUT ME',    pos:[3,1], color:'black', page:'about'    },
+  { id:'pawn4',  label:'EXPERIENCE',  pos:[4,1], color:'black', page:'exp'      },
+  { id:'pawn5',  label:'OPEN SOURCE', pos:[5,1], color:'black', page:'open'     },
+  { id:'pawn6',  label:'CONTACT',     pos:[6,1], color:'black', page:'contact'  },
+  { id:'pawn7',  label:'USES',        pos:[7,1], color:'black', page:'uses'     },
+];
+
+const PIECE_ICONS = {
+  king:'♚', queen:'♛', bishop:'♝', knight:'♞', rook:'♜', pawn:'♟'
+};
+
+function getPieceType(id) {
+  for (const k of ['king','queen','bishop','knight','rook','pawn']) {
+    if (id.startsWith(k)) return k;
+  }
+  return 'pawn';
+}
+
+const PAGES = {
+  about: {
+    icon:'♚', title:'About Me',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>whoami</div>
+        <div style="margin-top:10px;color:#e8e8e0;font-size:15px;font-weight:700;">Victor Maina</div>
+        <div style="margin-top:14px;"><span class="comment"># Software Engineer · Builder · Explorer</span></div>
+        <div style="margin-top:14px;color:#c8c8c0;line-height:2;">
+          I craft clean, meaningful software — from low-level systems to polished web interfaces.<br>
+          Based in Nairobi, shipping to the world. Obsessed with well-designed tools and<br>
+          the intersection of engineering and craft.
         </div>
-    </div>
-
-    <div class="homepage-text">
-        <h1>Welcome to My Chess-Themed Portfolio</h1>
-        <p>Click on any chess piece to explore different sections</p>
-    </div>
-    </div>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Wanjohi. All rights reserved.</p>
+        <div style="margin-top:18px;"><span class="prompt">$</span>cat interests.txt</div>
+        <div style="margin-top:8px;color:#c8c8c0;">
+          Systems programming &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Chess &nbsp;·&nbsp; Philosophy &nbsp;·&nbsp; Film
         </div>
-    </footer>
+        <div style="margin-top:18px;"><span class="prompt">$</span>echo $LOCATION</div>
+        <div style="margin-top:8px;color:#4ade80;">Nairobi, Kenya 🌍</div>
+      </div>`
+  },
+  skills: {
+    icon:'♛', title:'Skills',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>ls -la skills/</div>
+        <div style="margin-top:16px;">
+          ${[
+            ['Languages','JavaScript / TypeScript, Rust, C / C++, Python'],
+            ['Frontend','React, Next.js, HTML/CSS, Tailwind'],
+            ['Backend','Node.js, Express, REST APIs, GraphQL'],
+            ['Infrastructure','Linux, Nix, Docker, PostgreSQL, Redis'],
+            ['Tools','Neovim, tmux, Git, GitHub Actions'],
+          ].map(([cat, items]) => `
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;color:#4ade80;letter-spacing:0.14em;margin-bottom:5px;">${cat.toUpperCase()}/</div>
+              <ul class="list-items"><li>${items}</li></ul>
+            </div>`).join('')}
+        </div>
+      </div>`
+  },
+  projects: {
+    icon:'♝', title:'Projects',
+    render: () => `
+      <div class="cards-grid">
+        ${[
+          { title:'Project Alpha', desc:'High-performance systems tool built with Rust for blazing-fast CLI workflows.', tag:'RUST', icon:'⚙️' },
+          { title:'WebForge', desc:'Next.js template engine with edge-first architecture and zero-config deploys.', tag:'NEXT.JS', icon:'🌐' },
+          { title:'DevKit CLI', desc:'Developer toolchain automation utility — automate the boring parts.', tag:'CLI', icon:'🔧' },
+          { title:'NeoDB', desc:'Lightweight embedded key-value store written in pure C.', tag:'C', icon:'🗄️' },
+          { title:'ts-utils', desc:'Type-safe utility functions library for TypeScript projects.', tag:'TS', icon:'📦' },
+          { title:'nix-starter', desc:'Opinionated NixOS starter template for reproducible dev environments.', tag:'NIX', icon:'❄️' },
+        ].map(p => `
+          <div class="project-card">
+            <div class="pc-icon">${p.icon}</div>
+            <div class="pc-title">${p.title}</div>
+            <div class="pc-desc">${p.desc}</div>
+            <div class="pc-tag">${p.tag}</div>
+          </div>`).join('')}
+      </div>`
+  },
+  exp: {
+    icon:'♞', title:'Experience',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>cat experience.log</div>
+        <div style="margin-top:20px;">
+          ${[
+            { role:'Software Engineer', org:'Acme Corp · 2023 — present', note:'Full-stack systems design, API architecture, and performance engineering.' },
+            { role:'Backend Engineer', org:'StartupXYZ · 2021 — 2023', note:'Node.js microservices, PostgreSQL optimization, real-time systems.' },
+            { role:'Open Source Contributor', org:'Various · 2019 — present', note:'Rust crates, Linux tooling, community documentation.' },
+            { role:'Freelance Dev', org:'Self · 2018 — 2021', note:'Web apps, APIs, and developer tooling for clients across Africa.' },
+          ].map(e => `
+            <div class="exp-item">
+              <div class="role">${e.role}</div>
+              <div class="org">${e.org}</div>
+              <div class="note">${e.note}</div>
+            </div>`).join('')}
+        </div>
+      </div>`
+  },
+  contact: {
+    icon:'♜', title:'Contact',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>cat contact.json</div>
+        <div style="margin-top:16px;">
+          ${[
+            { label:'EMAIL', val:'victor@example.com' },
+            { label:'GITHUB', val:'@victor-maina' },
+            { label:'TWITTER/X', val:'@victormaina_' },
+            { label:'LINKEDIN', val:'linkedin.com/in/victormaina' },
+            { label:'LOCATION', val:'Nairobi, KE' },
+          ].map(c => `
+            <div class="contact-row">
+              <div class="cr-label">${c.label}</div>
+              <div class="cr-val">${c.val}</div>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:20px;color:#3a3a4a;font-size:11px;"># Prefer email for project inquiries.</div>
+      </div>`
+  },
+  blog: {
+    icon:'♟', title:'Blog',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>ls posts/ | sort -r</div>
+        <div style="margin-top:12px;">
+          <ul class="list-items">
+            ${[
+              ['2025-01-10','Why I switched to Rust for all my CLI tools'],
+              ['2024-11-03','Building reproducible dev environments with Nix'],
+              ['2024-08-17','Understanding zero-cost abstractions in practice'],
+              ['2024-05-22','Lessons from shipping a side project to 1,000 users'],
+              ['2024-02-11','C Arrays Are Not Pointers — a deep dive'],
+              ['2023-10-04','The case for a strict TSConfig'],
+            ].map(([date, title]) => `
+              <li>
+                <span style="color:#333;font-size:11px;min-width:90px;flex-shrink:0;">${date}</span>
+                <span>${title}</span>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </div>`
+  },
+  open: {
+    icon:'♝', title:'Open Source',
+    render: () => `
+      <div class="cards-grid">
+        ${[
+          { title:'nix-dotfiles', desc:'My personal NixOS configuration and dotfiles, version-controlled and reproducible.', tag:'NIX', icon:'❄️' },
+          { title:'term-colors', desc:'Terminal color scheme generator with live preview, written in Rust.', tag:'RUST', icon:'🎨' },
+          { title:'ts-utils', desc:'Type-safe utility functions for TypeScript — zero dependencies.', tag:'TS', icon:'📦' },
+          { title:'shell-snippets', desc:'Curated collection of useful shell scripts and aliases.', tag:'BASH', icon:'📜' },
+        ].map(p => `
+          <div class="project-card">
+            <div class="pc-icon">${p.icon}</div>
+            <div class="pc-title">${p.title}</div>
+            <div class="pc-desc">${p.desc}</div>
+            <div class="pc-tag">${p.tag}</div>
+          </div>`).join('')}
+      </div>`
+  },
+  uses: {
+    icon:'♞', title:'Uses',
+    render: () => `
+      <div class="terminal-block">
+        <div><span class="prompt">$</span>cat uses.md</div>
+        <div style="margin-top:20px;">
+          ${[
+            { cat:'Editor', items:['Neovim (primary)', 'VSCode (pair programming)'] },
+            { cat:'Operating System', items:['NixOS', 'Arch Linux (secondary)'] },
+            { cat:'Shell & Terminal', items:['Zsh + Starship prompt', 'tmux', 'Kitty terminal'] },
+            { cat:'Hardware', items:['ThinkPad X1 Carbon', 'Mechanical keyboard', '27" ultrawide monitor'] },
+            { cat:'Fonts', items:['JetBrains Mono (editor)', 'Iosevka (terminal)'] },
+            { cat:'Tools', items:['Git + Lazygit', 'Docker', 'ripgrep + fd'] },
+          ].map(s => `
+            <div class="uses-section">
+              <div class="us-cat">${s.cat.toUpperCase()}/</div>
+              <ul class="list-items">${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+            </div>`).join('')}
+        </div>
+      </div>`
+  },
+};
 
-    <script src="script.js"></script>
+// --- Three.js setup ---
+const root = document.getElementById('chess-root');
+let scene, camera, renderer, raycaster, mouse;
+let pieceMeshes = [];
+let selectedMesh = null, selectedPieceData = null;
+let hoveredMesh = null;
+let isDragging = false, prevMouse = {x:0,y:0};
+let camTheta = Math.PI * 0.28, camPhi = 1.0, camRadius = 15;
+let targetTheta = camTheta, targetPhi = camPhi, targetRadius = camRadius;
+let animT = 0;
+
+function init() {
+  const canvas = document.getElementById('chess-canvas');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a0c);
+  scene.fog = new THREE.FogExp2(0x0a0a0c, 0.028);
+
+  camera = new THREE.PerspectiveCamera(42, root.clientWidth / root.clientHeight, 0.1, 100);
+  updateCam();
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(root.clientWidth, root.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a1a2e, 3));
+  const dir = new THREE.DirectionalLight(0xffffff, 1.4);
+  dir.position.set(6, 12, 4); dir.castShadow = true;
+  dir.shadow.camera.near = 0.1; dir.shadow.camera.far = 40;
+  dir.shadow.camera.left = -10; dir.shadow.camera.right = 10;
+  dir.shadow.camera.top = 10; dir.shadow.camera.bottom = -10;
+  dir.shadow.mapSize.set(1024,1024);
+  scene.add(dir);
+  const gLight = new THREE.PointLight(0x4ade80, 0.6, 18);
+  gLight.position.set(-4, 5, -4);
+  scene.add(gLight);
+  const gLight2 = new THREE.PointLight(0x4ade80, 0.3, 12);
+  gLight2.position.set(4, 3, 4);
+  scene.add(gLight2);
+
+  buildBoard();
+  buildPieces();
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  canvas.addEventListener('mousedown', onMD);
+  canvas.addEventListener('mousemove', onMM);
+  canvas.addEventListener('mouseup', onMU);
+  canvas.addEventListener('click', onCL);
+  canvas.addEventListener('wheel', onWH, {passive:true});
+  window.addEventListener('resize', onResize);
+
+  document.getElementById('back-btn').addEventListener('click', closeOverlay);
+
+  animate();
+}
+
+function buildBoard() {
+  const sqGeo = new THREE.BoxGeometry(1, 0.1, 1);
+  for (let x=0;x<8;x++) for (let z=0;z<8;z++) {
+    const light = (x+z)%2===0;
+    const mat = new THREE.MeshStandardMaterial({
+      color: light ? 0x252530 : 0x0f0f16, roughness: 0.85, metalness: 0.05
+    });
+    const m = new THREE.Mesh(sqGeo, mat);
+    m.position.set(x-3.5, 0, z-3.5);
+    m.receiveShadow = true;
+    scene.add(m);
+  }
+  // Border
+  const bGeo = new THREE.BoxGeometry(9.6, 0.15, 9.6);
+  const bMat = new THREE.MeshStandardMaterial({ color: 0x0c0c14, roughness: 0.9 });
+  const border = new THREE.Mesh(bGeo, bMat);
+  border.position.y = -0.04;
+  scene.add(border);
+  // Grid lines glow effect using line segments
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x4ade8020 });
+  for (let i=0;i<=8;i++) {
+    const pts = [new THREE.Vector3(i-4,0.06,-4), new THREE.Vector3(i-4,0.06,4)];
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+    const pts2 = [new THREE.Vector3(-4,0.06,i-4), new THREE.Vector3(4,0.06,i-4)];
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), lineMat));
+  }
+}
+
+function makePieceGeo(type) {
+  switch(type) {
+    case 'king': {
+      const g = new THREE.CylinderGeometry(0.19, 0.24, 0.7, 8);
+      return g;
+    }
+    case 'queen': {
+      return new THREE.CylinderGeometry(0.13, 0.23, 0.65, 6);
+    }
+    case 'bishop': {
+      return new THREE.CylinderGeometry(0.09, 0.21, 0.58, 7);
+    }
+    case 'knight': {
+      return new THREE.BoxGeometry(0.26, 0.52, 0.22);
+    }
+    case 'rook': {
+      return new THREE.BoxGeometry(0.32, 0.48, 0.32);
+    }
+    default:
+      return new THREE.CylinderGeometry(0.11, 0.19, 0.42, 8);
+  }
+}
+
+function buildPieces() {
+  PIECES_DATA.forEach(p => {
+    const type = getPieceType(p.id);
+    const geo = makePieceGeo(type);
+    const isW = p.color === 'white';
+    const mat = new THREE.MeshStandardMaterial({
+      color: isW ? 0x3a3a4c : 0x18181e,
+      roughness: 0.45, metalness: 0.35,
+      emissive: isW ? 0x151520 : 0x08080e,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    mesh.position.set(p.pos[0]-3.5, 0.32, p.pos[1]-3.5);
+    mesh.userData = p;
+    scene.add(mesh);
+    pieceMeshes.push(mesh);
+  });
+}
+
+function updateCam() {
+  const x = camRadius * Math.sin(camPhi) * Math.sin(camTheta);
+  const y = camRadius * Math.cos(camPhi);
+  const z = camRadius * Math.sin(camPhi) * Math.cos(camTheta);
+  camera.position.set(x, y, z);
+  camera.lookAt(0, 0.5, 0);
+}
+
+function getMouseNDC(e) {
+  const r = root.getBoundingClientRect();
+  return {
+    x: ((e.clientX-r.left)/root.clientWidth)*2-1,
+    y: -((e.clientY-r.top)/root.clientHeight)*2+1
+  };
+}
+
+function onMD(e) {
+  isDragging = false;
+  prevMouse = {x:e.clientX,y:e.clientY};
+}
+function onMM(e) {
+  const dx = e.clientX-prevMouse.x, dy = e.clientY-prevMouse.y;
+  if (e.buttons===1 && (Math.abs(dx)+Math.abs(dy))>2) {
+    isDragging = true;
+    targetTheta -= dx*0.007;
+    targetPhi = Math.max(0.28, Math.min(1.38, targetPhi+dy*0.005));
+    prevMouse = {x:e.clientX,y:e.clientY};
+  }
+  const nd = getMouseNDC(e);
+  mouse.set(nd.x, nd.y);
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(pieceMeshes);
+  const tip = document.getElementById('tooltip');
+  const r = root.getBoundingClientRect();
+  if (hits.length>0) {
+    hoveredMesh = hits[0].object;
+    const p = hoveredMesh.userData;
+    tip.style.display = 'block';
+    tip.style.left = (e.clientX-r.left+14)+'px';
+    tip.style.top = (e.clientY-r.top-10)+'px';
+    tip.textContent = p.label;
+    root.style.cursor = 'pointer';
+  } else {
+    hoveredMesh = null;
+    tip.style.display = 'none';
+    root.style.cursor = isDragging ? 'grabbing' : 'default';
+  }
+}
+function onMU() {}
+function onWH(e) {
+  targetRadius = Math.max(6, Math.min(22, targetRadius+e.deltaY*0.015));
+}
+function onCL(e) {
+  if (isDragging) { isDragging=false; return; }
+  const nd = getMouseNDC(e);
+  mouse.set(nd.x, nd.y);
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(pieceMeshes);
+  if (hits.length>0) {
+    const mesh = hits[0].object;
+    const pd = mesh.userData;
+    if (selectedMesh === mesh) {
+      openPage(pd.page);
+    } else {
+      selectPiece(mesh, pd);
+    }
+  } else {
+    deselectPiece();
+  }
+}
+function onResize() {
+  camera.aspect = root.clientWidth/root.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(root.clientWidth, root.clientHeight);
+}
+
+function selectPiece(mesh, pd) {
+  deselectPiece();
+  selectedMesh = mesh;
+  selectedPieceData = pd;
+  mesh.material.color.set(0x4ade80);
+  mesh.material.emissive.set(0x1a4a20);
+  const lbl = document.getElementById('piece-label');
+  document.getElementById('pl-name').textContent = pd.label;
+  const type = getPieceType(pd.id);
+  document.getElementById('pl-sub').textContent = PIECE_ICONS[type] + ' ' + type.toUpperCase();
+  lbl.style.display = 'block';
+  lbl.style.opacity = '0';
+  lbl.style.transition = 'opacity 0.3s';
+  setTimeout(()=>lbl.style.opacity='1', 10);
+}
+function deselectPiece() {
+  if (selectedMesh) {
+    const isW = selectedMesh.userData.color==='white';
+    selectedMesh.material.color.set(isW ? 0x3a3a4c : 0x18181e);
+    selectedMesh.material.emissive.set(isW ? 0x151520 : 0x08080e);
+  }
+  selectedMesh = null; selectedPieceData = null;
+  document.getElementById('piece-label').style.display='none';
+}
+
+function openPage(pageId) {
+  const page = PAGES[pageId];
+  if (!page) return;
+  document.getElementById('page-bg-icon').textContent = page.icon;
+  document.getElementById('page-inner').innerHTML = `
+    <div class="page-title"><span>//</span> ${page.title}</div>
+    <hr class="page-rule">
+    ${page.render()}
+  `;
+  const ov = document.getElementById('overlay');
+  ov.classList.add('active');
+  ov.scrollTop = 0;
+  deselectPiece();
+}
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  animT = Date.now()*0.001;
+  camTheta += (targetTheta-camTheta)*0.07;
+  camPhi += (targetPhi-camPhi)*0.07;
+  camRadius += (targetRadius-camRadius)*0.07;
+  updateCam();
+
+  pieceMeshes.forEach((mesh, i) => {
+    const isSelected = mesh===selectedMesh;
+    const isHovered = mesh===hoveredMesh;
+    const baseY = 0.32;
+    if (isSelected) {
+      const ty = baseY + 0.22 + Math.sin(animT*2.5)*0.07;
+      mesh.position.y += (ty-mesh.position.y)*0.12;
+      mesh.rotation.y += 0.025;
+    } else if (isHovered) {
+      mesh.position.y += (baseY+0.1-mesh.position.y)*0.15;
+    } else {
+      mesh.position.y += (baseY-mesh.position.y)*0.1;
+      mesh.rotation.y += 0.003;
+    }
+  });
+
+  renderer.render(scene, camera);
+}
+
+window.closeOverlay = closeOverlay;
+init();
+</script>
 </body>
-</html> 
+</html>

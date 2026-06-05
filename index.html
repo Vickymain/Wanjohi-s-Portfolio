@@ -5,113 +5,289 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Victor Maina</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a0c; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
-  #chess-root { width: 100%; height: 100vh; position: relative; overflow: hidden; }
-  #chess-canvas { width: 100%; height: 100%; display: block; }
-  #header { position: absolute; top: 20px; left: 24px; z-index: 10; pointer-events: none; }
-  #header h1 { font-size: 24px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.05em; }
-  #header h1 span { color: #4ade80; }
-  #header p { font-size: 11px; color: #4ade80; letter-spacing: 0.15em; margin-top: 4px; opacity: 0.6; }
-  #hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #4ade80; letter-spacing: 0.12em; opacity: 0.45; pointer-events: none; text-align: center; }
-  #tooltip { position: absolute; pointer-events: none; z-index: 20; background: #0a0a0c; border: 1px solid #4ade80; padding: 5px 12px; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; display: none; white-space: nowrap; }
-  #piece-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 15; text-align: center; display: none; }
-  #piece-label .pname { font-size: 32px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.08em; text-shadow: 0 0 30px rgba(74,222,128,0.5); }
-  #piece-label .psub { font-size: 11px; color: #4ade80; letter-spacing: 0.2em; margin-top: 8px; opacity: 0.7; }
-  #piece-label .pclick { font-size: 10px; color: #4ade8088; letter-spacing: 0.15em; margin-top: 4px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0c; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
 
-  #overlay { position: absolute; inset: 0; z-index: 30; display: none; background: #0a0a0c; overflow-y: auto; }
-  #overlay.active { display: flex; flex-direction: column; }
-  .page-bg { position: absolute; inset: 0; opacity: 0.04; font-size: 300px; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; user-select: none; line-height: 1; }
-  .page-content { position: relative; z-index: 2; padding: 32px 40px; flex: 1; max-width: 900px; }
-  .page-back { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: #4ade80; letter-spacing: 0.15em; cursor: pointer; border: 1px solid #4ade8055; padding: 6px 14px; margin-bottom: 32px; background: transparent; font-family: 'Courier New', monospace; transition: background 0.2s, border-color 0.2s; }
-  .page-back:hover { background: rgba(74,222,128,0.08); border-color: #4ade80; }
-  .page-title { font-size: 28px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; letter-spacing: 0.04em; }
-  .page-title span { color: #4ade80; }
-  .page-rule { border: none; border-top: 1px solid #4ade8030; margin-bottom: 28px; }
-  .terminal-block { background: #0e0e12; border: 1px solid #1e1e26; padding: 24px; font-size: 13px; color: #c8c8c0; line-height: 1.9; margin-bottom: 20px; border-radius: 2px; }
-  .terminal-block .prompt { color: #4ade80; margin-right: 8px; }
-  .terminal-block .comment { color: #3a3a4a; }
-  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-  .project-card { background: #0e0e12; border: 1px solid #1e1e26; padding: 18px; transition: border-color 0.2s; border-radius: 2px; cursor: default; }
-  .project-card:hover { border-color: #4ade8066; }
-  .project-card .pc-icon { font-size: 22px; margin-bottom: 10px; }
-  .project-card .pc-title { font-size: 13px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; }
-  .project-card .pc-desc { font-size: 12px; color: #666; line-height: 1.6; }
-  .project-card .pc-tag { display: inline-block; font-size: 10px; color: #4ade80; border: 1px solid #4ade8033; padding: 2px 7px; margin-top: 10px; letter-spacing: 0.1em; }
-  .list-items { list-style: none; }
-  .list-items li { padding: 9px 0; border-bottom: 1px solid #141418; font-size: 13px; color: #c8c8c0; display: flex; align-items: baseline; gap: 10px; }
-  .list-items li::before { content: '—'; color: #4ade80; flex-shrink: 0; }
-  .exp-item { margin-bottom: 20px; padding-left: 16px; border-left: 2px solid #4ade8030; }
-  .exp-item .role { font-size: 14px; color: #e8e8e0; font-weight: 700; }
-  .exp-item .org { font-size: 11px; color: #4ade80; letter-spacing: 0.12em; margin: 4px 0; }
-  .exp-item .note { font-size: 12px; color: #555; }
-  .contact-row { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid #141418; }
-  .contact-row .cr-label { font-size: 11px; color: #4ade80; letter-spacing: 0.14em; min-width: 80px; }
-  .contact-row .cr-val { font-size: 13px; color: #c8c8c0; }
-  .uses-section { margin-bottom: 16px; }
-  .uses-section .us-cat { font-size: 11px; color: #4ade80; letter-spacing: 0.16em; margin-bottom: 6px; }
+#app { display: flex; width: 100vw; height: 100vh; }
+
+/* ── Chess side ── */
+#chess-side { flex: 1; position: relative; overflow: hidden; min-width: 0; }
+#chess-canvas { width: 100%; height: 100%; display: block; }
+
+#header { position: absolute; top: 20px; left: 24px; z-index: 10; pointer-events: none; }
+#header h1 { font-size: 22px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.05em; }
+#header p  { font-size: 10px; color: #4ade80; letter-spacing: 0.15em; margin-top: 4px; opacity: 0.6; }
+
+#hint {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; color: #4ade80; letter-spacing: 0.12em; opacity: 0.4;
+  pointer-events: none; text-align: center; white-space: nowrap;
+}
+#tooltip {
+  position: absolute; pointer-events: none; z-index: 20;
+  background: rgba(10,10,12,0.92); border: 1px solid #4ade80;
+  padding: 4px 10px; font-size: 10px; color: #4ade80;
+  letter-spacing: 0.12em; display: none; white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+#piece-label {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; z-index: 15; text-align: center; display: none;
+}
+#piece-label .pname  { font-size: 28px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.08em; text-shadow: 0 0 40px rgba(74,222,128,0.6); }
+#piece-label .psub   { font-size: 10px; color: #4ade80; letter-spacing: 0.2em; margin-top: 8px; opacity: 0.7; }
+#piece-label .pclick { font-size: 9px;  color: #4ade8066; letter-spacing: 0.15em; margin-top: 4px; }
+
+/* ── Terminal side ── */
+#terminal-side {
+  width: 360px; min-width: 300px;
+  border-left: 1px solid #1a1a24;
+  display: flex; flex-direction: column;
+  background: #06060e; overflow: hidden;
+}
+#term-header {
+  padding: 10px 14px; border-bottom: 1px solid #141420;
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.term-dot { width: 10px; height: 10px; border-radius: 50%; }
+.term-dot.r { background: #ff5f57; }
+.term-dot.y { background: #febc2e; }
+.term-dot.g { background: #28c840; }
+#term-title { font-size: 10px; color: #4ade80; letter-spacing: 0.18em; margin-left: 6px; opacity: 0.7; flex: 1; text-align: center; }
+#term-body {
+  flex: 1; overflow-y: auto; padding: 14px 16px 20px;
+  font-size: 12px; line-height: 1.75; color: #a0a090;
+  scrollbar-width: thin; scrollbar-color: #1e1e2a transparent;
+}
+#term-body::-webkit-scrollbar { width: 3px; }
+#term-body::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+.tl       { display: block; min-height: 1.75em; }
+.tl.cmd   { color: #4ade80; }
+.tl.out   { color: #7a8a7a; }
+.tl.hi    { color: #e8e8e0; }
+.tl.quote { color: #6ee7b7; font-style: italic; }
+.tl.move  { color: #5a6a5a; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.tl.key   { color: #fbbf24; font-weight: 700; }
+.tl.now   { color: #60a5fa; }
+.tl.blank { min-height: 0.7em; }
+.cursor-blink {
+  display: inline-block; width: 7px; height: 13px;
+  background: #4ade80; vertical-align: middle;
+  animation: cblink 1s step-end infinite; margin-left: 1px;
+}
+@keyframes cblink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── Page overlay ── */
+#overlay {
+  position: fixed; inset: 0; z-index: 50; display: none;
+  background: #0a0a0c; overflow-y: auto;
+}
+#overlay.active { display: flex; flex-direction: column; }
+.page-bg {
+  position: absolute; inset: 0; opacity: 0.04; font-size: 300px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; overflow: hidden; user-select: none; line-height: 1;
+}
+.page-content { position: relative; z-index: 2; padding: 32px 40px; flex: 1; max-width: 900px; }
+.page-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; color: #4ade80; letter-spacing: 0.15em; cursor: pointer;
+  border: 1px solid #4ade8055; padding: 6px 14px; margin-bottom: 32px;
+  background: transparent; font-family: 'Courier New', monospace;
+  transition: background 0.2s, border-color 0.2s;
+}
+.page-back:hover { background: rgba(74,222,128,0.08); border-color: #4ade80; }
+.page-title { font-size: 28px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; letter-spacing: 0.04em; }
+.page-title span { color: #4ade80; }
+.page-rule { border: none; border-top: 1px solid #4ade8030; margin-bottom: 28px; }
+.terminal-block { background: #0e0e12; border: 1px solid #1e1e26; padding: 24px; font-size: 13px; color: #c8c8c0; line-height: 1.9; margin-bottom: 20px; }
+.terminal-block .prompt { color: #4ade80; margin-right: 8px; }
+.terminal-block .comment { color: #3a3a4a; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; }
+.project-card { background: #0e0e12; border: 1px solid #1e1e26; padding: 18px; transition: border-color 0.2s; }
+.project-card:hover { border-color: #4ade8066; }
+.project-card .pc-icon  { font-size: 22px; margin-bottom: 10px; }
+.project-card .pc-title { font-size: 13px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; }
+.project-card .pc-desc  { font-size: 12px; color: #666; line-height: 1.6; }
+.project-card .pc-tag   { display: inline-block; font-size: 10px; color: #4ade80; border: 1px solid #4ade8033; padding: 2px 7px; margin-top: 10px; letter-spacing: 0.1em; }
+.list-items { list-style: none; }
+.list-items li { padding: 9px 0; border-bottom: 1px solid #141418; font-size: 13px; color: #c8c8c0; display: flex; align-items: baseline; gap: 10px; }
+.list-items li::before { content: '—'; color: #4ade80; flex-shrink: 0; }
+.exp-item { margin-bottom: 20px; padding-left: 16px; border-left: 2px solid #4ade8030; }
+.exp-item .role { font-size: 14px; color: #e8e8e0; font-weight: 700; }
+.exp-item .org  { font-size: 11px; color: #4ade80; letter-spacing: 0.12em; margin: 4px 0; }
+.exp-item .note { font-size: 12px; color: #555; }
+.contact-row { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid #141418; }
+.contact-row .cr-label { font-size: 11px; color: #4ade80; letter-spacing: 0.14em; min-width: 80px; }
+.contact-row .cr-val   { font-size: 13px; color: #c8c8c0; }
+.uses-section { margin-bottom: 16px; }
+.uses-section .us-cat { font-size: 11px; color: #4ade80; letter-spacing: 0.16em; margin-bottom: 6px; }
+
+@media (max-width: 900px) {
+  #app { flex-direction: column; }
+  #chess-side { height: 58vh; }
+  #terminal-side { width: 100%; min-width: 0; border-left: none; border-top: 1px solid #1a1a24; height: 42vh; }
+}
 </style>
 </head>
 <body>
-<div id="chess-root">
-  <div id="header">
-    <h1>Victor<span>_</span>Maina<span style="animation: blink 1.2s step-end infinite; display:inline-block">_</span></h1>
-    <p>// SELECT A PIECE TO NAVIGATE</p>
+<div id="app">
+
+  <!-- Chess -->
+  <div id="chess-side">
+    <div id="header">
+      <h1>Victor<span style="color:#4ade80"> </span>Maina<span style="animation:cblink 1.2s step-end infinite;display:inline-block;color:#4ade80">_</span></h1>
+      <p>// SELECT A PIECE TO NAVIGATE</p>
+    </div>
+    <canvas id="chess-canvas"></canvas>
+    <div id="hint">DRAG TO ROTATE &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; CLICK PIECE → SELECT &nbsp;·&nbsp; CLICK AGAIN → OPEN</div>
+    <div id="tooltip"></div>
+    <div id="piece-label">
+      <div class="pname" id="pl-name"></div>
+      <div class="psub"  id="pl-sub"></div>
+      <div class="pclick">CLICK AGAIN TO OPEN →</div>
+    </div>
   </div>
-  <canvas id="chess-canvas"></canvas>
-  <div id="hint">DRAG TO ROTATE &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; CLICK PIECE → SELECT &nbsp;·&nbsp; CLICK AGAIN → OPEN</div>
-  <div id="tooltip"></div>
-  <div id="piece-label">
-    <div class="pname" id="pl-name"></div>
-    <div class="psub" id="pl-sub"></div>
-    <div class="pclick">CLICK AGAIN TO OPEN →</div>
-  </div>
-  <div id="overlay">
-    <div class="page-bg" id="page-bg-icon"></div>
-    <div class="page-content">
-      <button class="page-back" id="back-btn">← BACK TO BOARD</button>
-      <div id="page-inner"></div>
+
+  <!-- Terminal -->
+  <div id="terminal-side">
+    <div id="term-header">
+      <div class="term-dot r"></div>
+      <div class="term-dot y"></div>
+      <div class="term-dot g"></div>
+      <span id="term-title">CHESS-REPLAY v2.0</span>
+    </div>
+    <div id="term-body">
+      <span class="cursor-blink" id="term-cursor"></span>
     </div>
   </div>
 </div>
 
-<style>
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-</style>
+<!-- Page overlay -->
+<div id="overlay">
+  <div class="page-bg" id="page-bg-icon"></div>
+  <div class="page-content">
+    <button class="page-back" id="back-btn">← BACK TO BOARD</button>
+    <div id="page-inner"></div>
+  </div>
+</div>
 
+<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script>
-const PIECES_DATA = [
-  { id:'king',   label:'ABOUT ME',    pos:[3,0], color:'white', page:'about'    },
-  { id:'queen',  label:'SKILLS',      pos:[4,0], color:'white', page:'skills'   },
-  { id:'bishop1',label:'PROJECTS',    pos:[2,0], color:'white', page:'projects' },
-  { id:'bishop2',label:'OPEN SOURCE', pos:[5,0], color:'white', page:'open'     },
-  { id:'knight1',label:'EXPERIENCE',  pos:[1,0], color:'white', page:'exp'      },
-  { id:'knight2',label:'USES',        pos:[6,0], color:'white', page:'uses'     },
-  { id:'rook1',  label:'BLOG',        pos:[0,0], color:'white', page:'blog'     },
-  { id:'rook2',  label:'CONTACT',     pos:[7,0], color:'white', page:'contact'  },
-  { id:'pawn0',  label:'PROJECTS',    pos:[0,1], color:'black', page:'projects' },
-  { id:'pawn1',  label:'BLOG',        pos:[1,1], color:'black', page:'blog'     },
-  { id:'pawn2',  label:'SKILLS',      pos:[2,1], color:'black', page:'skills'   },
-  { id:'pawn3',  label:'ABOUT ME',    pos:[3,1], color:'black', page:'about'    },
-  { id:'pawn4',  label:'EXPERIENCE',  pos:[4,1], color:'black', page:'exp'      },
-  { id:'pawn5',  label:'OPEN SOURCE', pos:[5,1], color:'black', page:'open'     },
-  { id:'pawn6',  label:'CONTACT',     pos:[6,1], color:'black', page:'contact'  },
-  { id:'pawn7',  label:'USES',        pos:[7,1], color:'black', page:'uses'     },
+/* ═══════════════════════════════════════════════════
+   GAME DATA — Caruana vs Aronian, Candidates 2014
+   Position: after move 22 (22...Nf8)
+═══════════════════════════════════════════════════ */
+const GAME_PGN = `[Event "Candidates 2014"]
+[Site "Khanty-Mansiysk RUS"]
+[Date "2014.03.14"]
+[White "Caruana, F"]
+[Black "Aronian, L"]
+[Result "1-0"]
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. d3 b5 7. Bb3 d6
+8. a3 O-O 9. Nc3 Nb8 10. Ne2 Nbd7 11. Ng3 Nc5 12. Ba2 c5 13. b4 Ne6
+14. c3 g6 15. d4 cxd4 16. cxd4 Nf4 17. d5 Nd7 18. Bxf4 exf4 19. Nf5 gxf5
+20. exf5 Bf6 21. Re1 Re8 22. Nd4 Nf8 23. Nxf5 Ng6 24. f3 Qd7 25. Qd3 b4
+26. axb4 a5 27. bxa5 Rxa5 28. Bb1 Bh4 29. Re4 Rxa1 30. Rxa1 f3 31. g3 Bxg3
+32. hxg3 fxg3 33. Rxg3 Nxf4 34. Qe3 Ng2 35. Qh3 Nf4 36. Qh4 Ng6 37. fxg6
+hxg6 38. Qxg6+ Kh8 39. Rg5 Re5 40. Rxe5 dxe5 41. Qh5+ Kg7 42. Bxf5 Qc6
+43. Be4 Qc3 44. Bf5 1-0`;
+
+const PAGE_BY_TYPE       = { k:'about', q:'skills', b:'projects', n:'exp',      r:'blog',    p:'contact' };
+const PAGE_BY_TYPE_BLACK = { k:'about', q:'skills', b:'open',     n:'uses',     r:'contact', p:'blog'    };
+const LABEL_BY_TYPE      = { k:'ABOUT ME', q:'SKILLS', b:'PROJECTS', n:'EXPERIENCE', r:'BLOG',    p:'CONTACT'    };
+const LABEL_BY_TYPE_BLACK= { k:'ABOUT ME', q:'SKILLS', b:'OPEN SOURCE', n:'USES', r:'CONTACT', p:'BLOG'       };
+const ICONS      = { k:'♚', q:'♛', b:'♝', n:'♞', r:'♜', p:'♟' };
+const TYPE_NAMES = { k:'King', q:'Queen', b:'Bishop', n:'Knight', r:'Rook', p:'Pawn' };
+
+/* ═══════════════════════════════════════════════════
+   TERMINAL SCRIPT
+═══════════════════════════════════════════════════ */
+const TERMINAL_SCRIPT = [
+  {t:'cmd',  s:'chess-replay --pgn "candidates-2014"'},
+  {t:'p',    ms:700},
+  {t:'out',  s:'Loading PGN from game database...'},
+  {t:'p',    ms:1000},
+  {t:'out',  s:'Validated. 44 moves. Result: 1-0'},
+  {t:'b'},
+  {t:'hi',   s:'╔══════════════════════════════════╗'},
+  {t:'hi',   s:'║  FIDE CANDIDATES TOURNAMENT 2014 ║'},
+  {t:'hi',   s:'╚══════════════════════════════════╝'},
+  {t:'b'},
+  {t:'hi',   s:'  WHITE ♔  Fabiano Caruana  (ITA)'},
+  {t:'hi',   s:'  BLACK ♚  Levon Aronian    (ARM)'},
+  {t:'b'},
+  {t:'out',  s:'  Event   : FIDE Candidates 2014'},
+  {t:'out',  s:'  Location: Khanty-Mansiysk, Russia'},
+  {t:'out',  s:'  Date    : March 14, 2014'},
+  {t:'out',  s:'  Opening : Ruy Lopez (C78)'},
+  {t:'out',  s:'  Result  : 1-0  (White wins)'},
+  {t:'b'},
+  {t:'quote',s:'  "This was my best game ever."'},
+  {t:'quote',s:'     — Fabiano Caruana'},
+  {t:'b'},
+  {t:'cmd',  s:'show-moves --annotate --position 22'},
+  {t:'p',    ms:500},
+  {t:'out',  s:'Board showing position after move 22.'},
+  {t:'b'},
+  {t:'hi',   s:'─── MOVE LIST ────────────────────'},
+  {t:'b'},
+  {t:'move', s:' 1.  e4          e5'},
+  {t:'move', s:' 2.  Nf3         Nc6'},
+  {t:'move', s:' 3.  Bb5         a6'},
+  {t:'move', s:' 4.  Ba4         Nf6'},
+  {t:'move', s:' 5.  O-O         Be7'},
+  {t:'move', s:' 6.  d3          b5'},
+  {t:'move', s:' 7.  Bb3         d6'},
+  {t:'move', s:' 8.  a3          O-O'},
+  {t:'move', s:' 9.  Nc3         Nb8'},
+  {t:'move', s:'10.  Ne2         Nbd7'},
+  {t:'move', s:'11.  Ng3         Nc5'},
+  {t:'move', s:'12.  Ba2         c5'},
+  {t:'move', s:'13.  b4          Ne6'},
+  {t:'move', s:'14.  c3          g6'},
+  {t:'move', s:'15.  d4          cxd4'},
+  {t:'move', s:'16.  cxd4        Nf4'},
+  {t:'move', s:'17.  d5          Nd7'},
+  {t:'move', s:'18.  Bxf4        exf4'},
+  {t:'key',  s:'19.  Nf5!! ★    gxf5   ← The brilliant sacrifice'},
+  {t:'move', s:'20.  exf5        Bf6'},
+  {t:'move', s:'21.  Re1         Re8'},
+  {t:'now',  s:'22.  Nd4  ◄     Nf8   ← Position on board'},
+  {t:'move', s:'23.  Nxf5        Ng6'},
+  {t:'move', s:'24.  f3          Qd7'},
+  {t:'move', s:'25.  Qd3         b4'},
+  {t:'move', s:'26.  axb4        a5'},
+  {t:'move', s:'27.  bxa5        Rxa5'},
+  {t:'move', s:'28.  Bb1         Bh4'},
+  {t:'move', s:'29.  Re4         Rxa1'},
+  {t:'move', s:'30.  Rxa1        f3'},
+  {t:'move', s:'31.  g3          Bxg3'},
+  {t:'move', s:'32.  hxg3        fxg3'},
+  {t:'move', s:'33.  Rxg3        Nxf4'},
+  {t:'move', s:'34.  Qe3         Ng2'},
+  {t:'move', s:'35.  Qh3         Nf4'},
+  {t:'move', s:'36.  Qh4         Ng6'},
+  {t:'move', s:'37.  fxg6        hxg6'},
+  {t:'move', s:'38.  Qxg6+       Kh8'},
+  {t:'move', s:'39.  Rg5         Re5'},
+  {t:'move', s:'40.  Rxe5        dxe5'},
+  {t:'move', s:'41.  Qh5+        Kg7'},
+  {t:'move', s:'42.  Bxf5        Qc6'},
+  {t:'move', s:'43.  Be4         Qc3'},
+  {t:'key',  s:'44.  Bf5         1-0  ✓  Caruana wins!'},
+  {t:'b'},
+  {t:'out',  s:'Game complete. A masterpiece of chess.'},
+  {t:'cmd',  s:'_'},
 ];
 
-const PIECE_ICONS = {
-  king:'♚', queen:'♛', bishop:'♝', knight:'♞', rook:'♜', pawn:'♟'
-};
-
-function getPieceType(id) {
-  for (const k of ['king','queen','bishop','knight','rook','pawn']) {
-    if (id.startsWith(k)) return k;
-  }
-  return 'pawn';
-}
-
+/* ═══════════════════════════════════════════════════
+   PAGE CONTENT
+═══════════════════════════════════════════════════ */
 const PAGES = {
   about: {
     icon:'♚', title:'About Me',
@@ -119,16 +295,14 @@ const PAGES = {
       <div class="terminal-block">
         <div><span class="prompt">$</span>whoami</div>
         <div style="margin-top:10px;color:#e8e8e0;font-size:15px;font-weight:700;">Victor Maina</div>
-        <div style="margin-top:14px;"><span class="comment"># Software Engineer · Builder · Explorer</span></div>
-        <div style="margin-top:14px;color:#c8c8c0;line-height:2;">
-          I craft clean, meaningful software — from low-level systems to polished web interfaces.<br>
-          Based in Nairobi, shipping to the world. Obsessed with well-designed tools and<br>
-          the intersection of engineering and craft.
+        <div style="margin-top:10px;color:#3a3a4a;"># Software Engineer · Chess Enthusiast · Builder</div>
+        <div style="margin-top:16px;color:#c8c8c0;line-height:2;">
+          I build clean, meaningful software — from web applications to AI-driven tools.<br>
+          Based in Nairobi, Kenya. Studying Computer Science at Maseno University since 2022.<br>
+          Passionate about chess: the board you see is Caruana vs Aronian, Candidates 2014.
         </div>
-        <div style="margin-top:18px;"><span class="prompt">$</span>cat interests.txt</div>
-        <div style="margin-top:8px;color:#c8c8c0;">
-          Systems programming &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Chess &nbsp;·&nbsp; Philosophy &nbsp;·&nbsp; Film
-        </div>
+        <div style="margin-top:18px;"><span class="prompt">$</span>echo $CHESS_RATING</div>
+        <div style="margin-top:8px;color:#c8c8c0;">~1000 ELO on chess.com · the journey never stops · IM level is the goal</div>
         <div style="margin-top:18px;"><span class="prompt">$</span>echo $LOCATION</div>
         <div style="margin-top:8px;color:#4ade80;">Nairobi, Kenya 🌍</div>
       </div>`
@@ -140,12 +314,13 @@ const PAGES = {
         <div><span class="prompt">$</span>ls -la skills/</div>
         <div style="margin-top:16px;">
           ${[
-            ['Languages','JavaScript / TypeScript, Rust, C / C++, Python'],
-            ['Frontend','React, Next.js, HTML/CSS, Tailwind'],
-            ['Backend','Node.js, Express, REST APIs, GraphQL'],
-            ['Infrastructure','Linux, Nix, Docker, PostgreSQL, Redis'],
-            ['Tools','Neovim, tmux, Git, GitHub Actions'],
-          ].map(([cat, items]) => `
+            ['Languages','JavaScript, Python, PHP, C / C++, TypeScript'],
+            ['Frontend','HTML5, CSS3, React, Next.js, Tailwind CSS'],
+            ['Backend','Node.js, Express, Django, Laravel, REST APIs'],
+            ['Database','MySQL, PostgreSQL, SQLite'],
+            ['Tools','Git, GitHub, Docker, VS Code, Cursor, Linux'],
+            ['Learning','Machine Learning, AI, Rust, Three.js'],
+          ].map(([cat,items])=>`
             <div style="margin-bottom:14px;">
               <div style="font-size:11px;color:#4ade80;letter-spacing:0.14em;margin-bottom:5px;">${cat.toUpperCase()}/</div>
               <ul class="list-items"><li>${items}</li></ul>
@@ -158,13 +333,13 @@ const PAGES = {
     render: () => `
       <div class="cards-grid">
         ${[
-          { title:'Project Alpha', desc:'High-performance systems tool built with Rust for blazing-fast CLI workflows.', tag:'RUST', icon:'⚙️' },
-          { title:'WebForge', desc:'Next.js template engine with edge-first architecture and zero-config deploys.', tag:'NEXT.JS', icon:'🌐' },
-          { title:'DevKit CLI', desc:'Developer toolchain automation utility — automate the boring parts.', tag:'CLI', icon:'🔧' },
-          { title:'NeoDB', desc:'Lightweight embedded key-value store written in pure C.', tag:'C', icon:'🗄️' },
-          { title:'ts-utils', desc:'Type-safe utility functions library for TypeScript projects.', tag:'TS', icon:'📦' },
-          { title:'nix-starter', desc:'Opinionated NixOS starter template for reproducible dev environments.', tag:'NIX', icon:'❄️' },
-        ].map(p => `
+          {title:'POSHPOINT',desc:'Full-stack web application with sophisticated UI and backend.',tag:'WEB',icon:'🌐'},
+          {title:'QUICKDROP',desc:'Fast delivery platform connecting users to real-time services.',tag:'PHP',icon:'⚡'},
+          {title:'Ring Africa',desc:'Community platform showcasing African innovation.',tag:'JS',icon:'🌍'},
+          {title:'Chess Portfolio',desc:'This portfolio — 3D chess board with Three.js + chess.js.',tag:'THREE.JS',icon:'♛'},
+          {title:'ML Experiments',desc:'Machine learning models and AI-driven explorations.',tag:'PYTHON',icon:'🤖'},
+          {title:'Open Projects',desc:'Various open source tools and experiments on GitHub.',tag:'OSS',icon:'📦'},
+        ].map(p=>`
           <div class="project-card">
             <div class="pc-icon">${p.icon}</div>
             <div class="pc-title">${p.title}</div>
@@ -180,11 +355,11 @@ const PAGES = {
         <div><span class="prompt">$</span>cat experience.log</div>
         <div style="margin-top:20px;">
           ${[
-            { role:'Software Engineer', org:'Acme Corp · 2023 — present', note:'Full-stack systems design, API architecture, and performance engineering.' },
-            { role:'Backend Engineer', org:'StartupXYZ · 2021 — 2023', note:'Node.js microservices, PostgreSQL optimization, real-time systems.' },
-            { role:'Open Source Contributor', org:'Various · 2019 — present', note:'Rust crates, Linux tooling, community documentation.' },
-            { role:'Freelance Dev', org:'Self · 2018 — 2021', note:'Web apps, APIs, and developer tooling for clients across Africa.' },
-          ].map(e => `
+            {role:'Computer Science Student',org:'Maseno University · 2022 — present',note:'Algorithms, data structures, software engineering, and growing AI focus.'},
+            {role:'Freelance Web Developer',org:'Self · 2022 — present',note:'Full-stack web apps for clients — design through deployment.'},
+            {role:'Open Source Contributor',org:'GitHub · 2023 — present',note:'Personal tools and contributions to open source projects.'},
+            {role:'Chess Enthusiast',org:'chess.com · ongoing',note:'Strategic thinking and pattern recognition — lessons that transfer directly to code.'},
+          ].map(e=>`
             <div class="exp-item">
               <div class="role">${e.role}</div>
               <div class="org">${e.org}</div>
@@ -200,18 +375,17 @@ const PAGES = {
         <div><span class="prompt">$</span>cat contact.json</div>
         <div style="margin-top:16px;">
           ${[
-            { label:'EMAIL', val:'victor@example.com' },
-            { label:'GITHUB', val:'@victor-maina' },
-            { label:'TWITTER/X', val:'@victormaina_' },
-            { label:'LINKEDIN', val:'linkedin.com/in/victormaina' },
-            { label:'LOCATION', val:'Nairobi, KE' },
-          ].map(c => `
+            {label:'EMAIL',   val:'wanjohi.vmaina@gmail.com'},
+            {label:'GITHUB',  val:'github.com/Vickymain'},
+            {label:'CHESS',   val:'chess.com  ·  ~1000 ELO'},
+            {label:'LOCATION',val:'Nairobi, Kenya'},
+          ].map(c=>`
             <div class="contact-row">
               <div class="cr-label">${c.label}</div>
               <div class="cr-val">${c.val}</div>
             </div>`).join('')}
         </div>
-        <div style="margin-top:20px;color:#3a3a4a;font-size:11px;"># Prefer email for project inquiries.</div>
+        <div style="margin-top:20px;color:#3a3a4a;font-size:11px;"># Email preferred for project inquiries and collaborations.</div>
       </div>`
   },
   blog: {
@@ -222,13 +396,13 @@ const PAGES = {
         <div style="margin-top:12px;">
           <ul class="list-items">
             ${[
-              ['2025-01-10','Why I switched to Rust for all my CLI tools'],
-              ['2024-11-03','Building reproducible dev environments with Nix'],
-              ['2024-08-17','Understanding zero-cost abstractions in practice'],
-              ['2024-05-22','Lessons from shipping a side project to 1,000 users'],
-              ['2024-02-11','C Arrays Are Not Pointers — a deep dive'],
-              ['2023-10-04','The case for a strict TSConfig'],
-            ].map(([date, title]) => `
+              ['2024-12-01','Why chess and coding are the same discipline'],
+              ['2024-09-15','Building my first Django application from scratch'],
+              ['2024-06-20','What Caruana vs Aronian 2014 teaches about planning'],
+              ['2024-03-10','Getting started with Machine Learning in Python'],
+              ['2023-11-05','The power of open source — my first contribution'],
+              ['2023-07-22','From zero to 1000 ELO — lessons from chess.com'],
+            ].map(([date,title])=>`
               <li>
                 <span style="color:#333;font-size:11px;min-width:90px;flex-shrink:0;">${date}</span>
                 <span>${title}</span>
@@ -242,11 +416,11 @@ const PAGES = {
     render: () => `
       <div class="cards-grid">
         ${[
-          { title:'nix-dotfiles', desc:'My personal NixOS configuration and dotfiles, version-controlled and reproducible.', tag:'NIX', icon:'❄️' },
-          { title:'term-colors', desc:'Terminal color scheme generator with live preview, written in Rust.', tag:'RUST', icon:'🎨' },
-          { title:'ts-utils', desc:'Type-safe utility functions for TypeScript — zero dependencies.', tag:'TS', icon:'📦' },
-          { title:'shell-snippets', desc:'Curated collection of useful shell scripts and aliases.', tag:'BASH', icon:'📜' },
-        ].map(p => `
+          {title:'chess-portfolio',desc:'This portfolio — open source 3D interactive chess built with Three.js.',tag:'JS',icon:'♛'},
+          {title:'Ring Africa',desc:'Open platform celebrating and connecting African communities.',tag:'WEB',icon:'🌍'},
+          {title:'ML Notebooks',desc:'Public notebooks exploring ML and AI concepts.',tag:'PYTHON',icon:'📓'},
+          {title:'shell-tools',desc:'Shell scripts and automation tools for the developer workflow.',tag:'BASH',icon:'📜'},
+        ].map(p=>`
           <div class="project-card">
             <div class="pc-icon">${p.icon}</div>
             <div class="pc-title">${p.title}</div>
@@ -262,13 +436,13 @@ const PAGES = {
         <div><span class="prompt">$</span>cat uses.md</div>
         <div style="margin-top:20px;">
           ${[
-            { cat:'Editor', items:['Neovim (primary)', 'VSCode (pair programming)'] },
-            { cat:'Operating System', items:['NixOS', 'Arch Linux (secondary)'] },
-            { cat:'Shell & Terminal', items:['Zsh + Starship prompt', 'tmux', 'Kitty terminal'] },
-            { cat:'Hardware', items:['ThinkPad X1 Carbon', 'Mechanical keyboard', '27" ultrawide monitor'] },
-            { cat:'Fonts', items:['JetBrains Mono (editor)', 'Iosevka (terminal)'] },
-            { cat:'Tools', items:['Git + Lazygit', 'Docker', 'ripgrep + fd'] },
-          ].map(s => `
+            {cat:'Editor',items:['VS Code (primary)','Cursor (AI-assisted)','Vim (terminal)']},
+            {cat:'Languages',items:['JavaScript / Python (daily)','PHP (backend)','HTML + CSS (frontend)']},
+            {cat:'Shell',items:['PowerShell (Windows)','Bash / WSL (Linux)','Git CLI']},
+            {cat:'Hardware',items:['Windows 11 PC','External monitor','Mechanical keyboard']},
+            {cat:'Chess',items:['chess.com (online)','Lichess (analysis)','Physical Staunton set']},
+            {cat:'Tools',items:['GitHub','Figma','Postman']},
+          ].map(s=>`
             <div class="uses-section">
               <div class="us-cat">${s.cat.toUpperCase()}/</div>
               <ul class="list-items">${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
@@ -278,136 +452,225 @@ const PAGES = {
   },
 };
 
-// --- Three.js setup ---
-const root = document.getElementById('chess-root');
+/* ═══════════════════════════════════════════════════
+   PIECE TEXTURES
+   Primary: Lichess cburnett SVGs (open source, free)
+   Fallback: canvas-drawn pieces
+═══════════════════════════════════════════════════ */
+
+// Lichess cburnett piece set — same pieces used on Lichess.org broadcasts
+const LICHESS_BASE  = 'https://lichess1.org/assets/piece/cburnett/';
+const PIECE_CODES   = ['wK','wQ','wR','wB','wN','wP','bK','bQ','bR','bB','bN','bP'];
+const pieceTex      = {};
+
+function makeCanvasTex(code) {
+  const isW  = code[0] === 'w';
+  const type = code[1];
+  const syms = { K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙' };
+  const symB = { K:'♚', Q:'♛', R:'♜', B:'♝', N:'♞', P:'♟' };
+  const sym  = isW ? syms[type] : symB[type];
+
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, 256, 256);
+
+  // Drop shadow
+  ctx.shadowColor  = 'rgba(0,0,0,0.65)';
+  ctx.shadowBlur   = 18;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 5;
+
+  ctx.font         = 'bold 192px serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Outline pass
+  ctx.strokeStyle = isW ? '#3a200e' : '#b8802a';
+  ctx.lineWidth   = 10;
+  ctx.strokeText(sym, 128, 136);
+
+  ctx.shadowColor = 'transparent';
+
+  // Fill pass
+  ctx.fillStyle = isW ? '#f2e8d0' : '#1e1008';
+  ctx.fillText(sym, 128, 136);
+
+  const tex       = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+async function loadPieceTextures() {
+  const loader = new THREE.TextureLoader();
+
+  await Promise.all(PIECE_CODES.map(code => new Promise(resolve => {
+    // Try Lichess CDN first
+    loader.load(
+      LICHESS_BASE + code + '.svg',
+      tex => { pieceTex[code] = tex; resolve(); },
+      undefined,
+      () => {
+        // Lichess failed — use canvas fallback
+        pieceTex[code] = makeCanvasTex(code);
+        resolve();
+      }
+    );
+  })));
+}
+
+/* ═══════════════════════════════════════════════════
+   THREE.JS — BOARD & PIECE SPRITES
+═══════════════════════════════════════════════════ */
+const chessRoot   = document.getElementById('chess-side');
+const chessCanvas = document.getElementById('chess-canvas');
+
 let scene, camera, renderer, raycaster, mouse;
-let pieceMeshes = [];
-let selectedMesh = null, selectedPieceData = null;
-let hoveredMesh = null;
-let isDragging = false, prevMouse = {x:0,y:0};
-let camTheta = Math.PI * 0.28, camPhi = 1.0, camRadius = 15;
-let targetTheta = camTheta, targetPhi = camPhi, targetRadius = camRadius;
-let animT = 0;
+let pieceMeshes   = [];   // { sprite, type, isW, label, page }
+let selectedEntry = null;
+let hoveredEntry  = null;
+let isDragging    = false, prevMouse = {x:0,y:0};
+let camTheta = Math.PI*0.28, camPhi = 1.00, camRadius = 13.5;
+let tgtTheta = camTheta, tgtPhi = camPhi, tgtRadius = camRadius;
+let animT    = 0;
 
-function init() {
-  const canvas = document.getElementById('chess-canvas');
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a0c);
-  scene.fog = new THREE.FogExp2(0x0a0a0c, 0.028);
+/* ── Board square texture (chess.com maple/rosewood palette) ── */
+function makeSquareTex(isLight) {
+  const C   = document.createElement('canvas');
+  C.width = C.height = 128;
+  const ctx = C.getContext('2d');
 
-  camera = new THREE.PerspectiveCamera(42, root.clientWidth / root.clientHeight, 0.1, 100);
-  updateCam();
+  // Base colour — chess.com's classic wood palette
+  ctx.fillStyle = isLight ? '#f0d9b5' : '#b58863';
+  ctx.fillRect(0, 0, 128, 128);
 
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setSize(root.clientWidth, root.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Subtle grain lines
+  for (let i = 0; i < 18; i++) {
+    const cx = Math.random() * 150 - 10;
+    ctx.strokeStyle = isLight
+      ? `rgba(150,105,55,${0.05 + Math.random() * 0.09})`
+      : `rgba(60,30,8,${0.07 + Math.random() * 0.12})`;
+    ctx.lineWidth = 0.6 + Math.random() * 1.4;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.random() * 12 - 6, 0);
+    ctx.bezierCurveTo(
+      cx + Math.random() * 24 - 12, 40,
+      cx + Math.random() * 24 - 12, 88,
+      cx + Math.random() * 12 - 6, 128
+    );
+    ctx.stroke();
+  }
 
-  // Lights
-  scene.add(new THREE.AmbientLight(0x1a1a2e, 3));
-  const dir = new THREE.DirectionalLight(0xffffff, 1.4);
-  dir.position.set(6, 12, 4); dir.castShadow = true;
-  dir.shadow.camera.near = 0.1; dir.shadow.camera.far = 40;
-  dir.shadow.camera.left = -10; dir.shadow.camera.right = 10;
-  dir.shadow.camera.top = 10; dir.shadow.camera.bottom = -10;
-  dir.shadow.mapSize.set(1024,1024);
-  scene.add(dir);
-  const gLight = new THREE.PointLight(0x4ade80, 0.6, 18);
-  gLight.position.set(-4, 5, -4);
-  scene.add(gLight);
-  const gLight2 = new THREE.PointLight(0x4ade80, 0.3, 12);
-  gLight2.position.set(4, 3, 4);
-  scene.add(gLight2);
-
-  buildBoard();
-  buildPieces();
-
-  raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
-
-  canvas.addEventListener('mousedown', onMD);
-  canvas.addEventListener('mousemove', onMM);
-  canvas.addEventListener('mouseup', onMU);
-  canvas.addEventListener('click', onCL);
-  canvas.addEventListener('wheel', onWH, {passive:true});
-  window.addEventListener('resize', onResize);
-
-  document.getElementById('back-btn').addEventListener('click', closeOverlay);
-
-  animate();
+  const tex        = new THREE.CanvasTexture(C);
+  tex.needsUpdate  = true;
+  return tex;
 }
 
+function makeBorderTex() {
+  const C   = document.createElement('canvas');
+  C.width = C.height = 128;
+  const ctx = C.getContext('2d');
+  ctx.fillStyle = '#3a1a08';
+  ctx.fillRect(0, 0, 128, 128);
+  for (let i = 0; i < 14; i++) {
+    const x = Math.random() * 140 - 6;
+    ctx.strokeStyle = `rgba(22,8,2,${0.12 + Math.random() * 0.18})`;
+    ctx.lineWidth   = 1 + Math.random() * 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.bezierCurveTo(x + Math.random() * 20 - 10, 42, x + Math.random() * 20 - 10, 86, x + Math.random() * 12 - 6, 128);
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(C);
+}
+
+/* ── Board geometry ── */
 function buildBoard() {
-  const sqGeo = new THREE.BoxGeometry(1, 0.1, 1);
-  for (let x=0;x<8;x++) for (let z=0;z<8;z++) {
-    const light = (x+z)%2===0;
-    const mat = new THREE.MeshStandardMaterial({
-      color: light ? 0x252530 : 0x0f0f16, roughness: 0.85, metalness: 0.05
-    });
-    const m = new THREE.Mesh(sqGeo, mat);
-    m.position.set(x-3.5, 0, z-3.5);
-    m.receiveShadow = true;
-    scene.add(m);
-  }
-  // Border
-  const bGeo = new THREE.BoxGeometry(9.6, 0.15, 9.6);
-  const bMat = new THREE.MeshStandardMaterial({ color: 0x0c0c14, roughness: 0.9 });
-  const border = new THREE.Mesh(bGeo, bMat);
-  border.position.y = -0.04;
-  scene.add(border);
-  // Grid lines glow effect using line segments
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x4ade8020 });
-  for (let i=0;i<=8;i++) {
-    const pts = [new THREE.Vector3(i-4,0.06,-4), new THREE.Vector3(i-4,0.06,4)];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
-    const pts2 = [new THREE.Vector3(-4,0.06,i-4), new THREE.Vector3(4,0.06,i-4)];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), lineMat));
-  }
-}
+  const lightTex  = makeSquareTex(true);
+  const darkTex   = makeSquareTex(false);
+  const borderTex = makeBorderTex();
 
-function makePieceGeo(type) {
-  switch(type) {
-    case 'king': {
-      const g = new THREE.CylinderGeometry(0.19, 0.24, 0.7, 8);
-      return g;
+  // 8×8 squares
+  const sqGeo = new THREE.BoxGeometry(1, 0.10, 1);
+  for (let col = 0; col < 8; col++) {
+    for (let row = 0; row < 8; row++) {
+      const isLight = (col + row) % 2 === 0;
+      const mat = new THREE.MeshStandardMaterial({
+        map:       isLight ? lightTex : darkTex,
+        roughness: 0.75,
+        metalness: 0.02,
+      });
+      const m = new THREE.Mesh(sqGeo, mat);
+      m.position.set(col - 3.5, 0, row - 3.5);
+      m.receiveShadow = true;
+      scene.add(m);
     }
-    case 'queen': {
-      return new THREE.CylinderGeometry(0.13, 0.23, 0.65, 6);
-    }
-    case 'bishop': {
-      return new THREE.CylinderGeometry(0.09, 0.21, 0.58, 7);
-    }
-    case 'knight': {
-      return new THREE.BoxGeometry(0.26, 0.52, 0.22);
-    }
-    case 'rook': {
-      return new THREE.BoxGeometry(0.32, 0.48, 0.32);
-    }
-    default:
-      return new THREE.CylinderGeometry(0.11, 0.19, 0.42, 8);
+  }
+
+  // Walnut border frame
+  const borderMat = new THREE.MeshStandardMaterial({ map: borderTex, roughness: 0.88 });
+  scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.14, 10.6), borderMat), { position: new THREE.Vector3(0, -0.03, 0) }));
+
+  // Inner cherry rail
+  const railMat = new THREE.MeshStandardMaterial({ color: 0x6B3A1F, roughness: 0.72 });
+  scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(8.28, 0.12, 8.28), railMat), { position: new THREE.Vector3(0, -0.02, 0) }));
+
+  // Base slab
+  const slabMat = new THREE.MeshStandardMaterial({ color: 0x1e0a04, roughness: 0.95 });
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.20, 10.6), slabMat);
+  slab.position.y = -0.18;
+  slab.receiveShadow = true;
+  scene.add(slab);
+
+  // Bevel edge highlight
+  const edgeMat = new THREE.MeshStandardMaterial({ color: 0x8B4E12, roughness: 0.62, metalness: 0.05 });
+  for (let s = 0; s < 4; s++) {
+    const a = s * (Math.PI / 2);
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.06, 0.26), edgeMat);
+    edge.position.set(Math.sin(a) * 5.17, 0.05, Math.cos(a) * 5.17);
+    edge.rotation.y = a;
+    scene.add(edge);
   }
 }
 
-function buildPieces() {
-  PIECES_DATA.forEach(p => {
-    const type = getPieceType(p.id);
-    const geo = makePieceGeo(type);
-    const isW = p.color === 'white';
-    const mat = new THREE.MeshStandardMaterial({
-      color: isW ? 0x3a3a4c : 0x18181e,
-      roughness: 0.45, metalness: 0.35,
-      emissive: isW ? 0x151520 : 0x08080e,
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.castShadow = true;
-    mesh.position.set(p.pos[0]-3.5, 0.32, p.pos[1]-3.5);
-    mesh.userData = p;
-    scene.add(mesh);
-    pieceMeshes.push(mesh);
-  });
+/* ── Place pieces as sprites from chess.js board state ── */
+function buildPieces(chess) {
+  // Remove old sprites
+  pieceMeshes.forEach(e => scene.remove(e.sprite));
+  pieceMeshes = [];
+
+  const board = chess.board();
+  // board[row][col]: row 0 = rank 8, col 0 = file a
+  // Three.js: x = col − 3.5, z = row − 3.5  (rank8 far/z=-3.5, rank1 near/z=3.5)
+
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const sq = board[row][col];
+      if (!sq) continue;
+
+      const isW  = sq.color === 'w';
+      const code = (isW ? 'w' : 'b') + sq.type.toUpperCase();
+      const tex  = pieceTex[code] || makeCanvasTex(code);
+
+      const mat = new THREE.SpriteMaterial({
+        map:         tex,
+        transparent: true,
+        sizeAttenuation: true,
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(0.90, 0.90, 1);
+      sprite.position.set(col - 3.5, 0.58, row - 3.5);
+      sprite.renderOrder = 1;
+      scene.add(sprite);
+
+      const label = isW ? LABEL_BY_TYPE[sq.type] : LABEL_BY_TYPE_BLACK[sq.type];
+      const page  = isW ? PAGE_BY_TYPE[sq.type]  : PAGE_BY_TYPE_BLACK[sq.type];
+      pieceMeshes.push({ sprite, type: sq.type, isW, label, page });
+    }
+  }
 }
 
+/* ── Camera ── */
 function updateCam() {
   const x = camRadius * Math.sin(camPhi) * Math.sin(camTheta);
   const y = camRadius * Math.cos(camPhi);
@@ -416,146 +679,248 @@ function updateCam() {
   camera.lookAt(0, 0.5, 0);
 }
 
-function getMouseNDC(e) {
-  const r = root.getBoundingClientRect();
-  return {
-    x: ((e.clientX-r.left)/root.clientWidth)*2-1,
-    y: -((e.clientY-r.top)/root.clientHeight)*2+1
-  };
+/* ── Raycasting against sprites ── */
+function getHit(e) {
+  const r = chessRoot.getBoundingClientRect();
+  mouse.set(
+    ((e.clientX - r.left) / r.width)  *  2 - 1,
+    -((e.clientY - r.top)  / r.height) *  2 + 1
+  );
+  raycaster.setFromCamera(mouse, camera);
+  const sprites = pieceMeshes.map(e => e.sprite);
+  const hits    = raycaster.intersectObjects(sprites);
+  if (!hits.length) return null;
+  const hit = hits[0].object;
+  return pieceMeshes.find(e => e.sprite === hit) || null;
 }
 
-function onMD(e) {
-  isDragging = false;
-  prevMouse = {x:e.clientX,y:e.clientY};
-}
+/* ── Mouse events ── */
+function onMD(e) { isDragging = false; prevMouse = {x:e.clientX, y:e.clientY}; }
 function onMM(e) {
-  const dx = e.clientX-prevMouse.x, dy = e.clientY-prevMouse.y;
-  if (e.buttons===1 && (Math.abs(dx)+Math.abs(dy))>2) {
+  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
+  if (e.buttons === 1 && Math.abs(dx) + Math.abs(dy) > 2) {
     isDragging = true;
-    targetTheta -= dx*0.007;
-    targetPhi = Math.max(0.28, Math.min(1.38, targetPhi+dy*0.005));
-    prevMouse = {x:e.clientX,y:e.clientY};
+    tgtTheta  -= dx * 0.007;
+    tgtPhi     = Math.max(0.18, Math.min(1.45, tgtPhi + dy * 0.005));
+    prevMouse  = {x:e.clientX, y:e.clientY};
   }
-  const nd = getMouseNDC(e);
-  mouse.set(nd.x, nd.y);
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(pieceMeshes);
+  const hit = getHit(e);
   const tip = document.getElementById('tooltip');
-  const r = root.getBoundingClientRect();
-  if (hits.length>0) {
-    hoveredMesh = hits[0].object;
-    const p = hoveredMesh.userData;
+  const r   = chessRoot.getBoundingClientRect();
+  if (hit) {
+    hoveredEntry = hit;
     tip.style.display = 'block';
-    tip.style.left = (e.clientX-r.left+14)+'px';
-    tip.style.top = (e.clientY-r.top-10)+'px';
-    tip.textContent = p.label;
-    root.style.cursor = 'pointer';
+    tip.style.left = (e.clientX - r.left + 14) + 'px';
+    tip.style.top  = (e.clientY - r.top  - 10) + 'px';
+    tip.textContent = hit.label;
+    chessRoot.style.cursor = 'pointer';
   } else {
-    hoveredMesh = null;
+    hoveredEntry = null;
     tip.style.display = 'none';
-    root.style.cursor = isDragging ? 'grabbing' : 'default';
+    chessRoot.style.cursor = isDragging ? 'grabbing' : 'default';
   }
 }
 function onMU() {}
-function onWH(e) {
-  targetRadius = Math.max(6, Math.min(22, targetRadius+e.deltaY*0.015));
-}
+function onWH(e) { tgtRadius = Math.max(6, Math.min(22, tgtRadius + e.deltaY * 0.015)); }
 function onCL(e) {
-  if (isDragging) { isDragging=false; return; }
-  const nd = getMouseNDC(e);
-  mouse.set(nd.x, nd.y);
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(pieceMeshes);
-  if (hits.length>0) {
-    const mesh = hits[0].object;
-    const pd = mesh.userData;
-    if (selectedMesh === mesh) {
-      openPage(pd.page);
-    } else {
-      selectPiece(mesh, pd);
-    }
+  if (isDragging) { isDragging = false; return; }
+  const hit = getHit(e);
+  if (hit) {
+    if (selectedEntry === hit) openPage(hit.page);
+    else selectEntry(hit);
   } else {
-    deselectPiece();
+    deselectEntry();
   }
 }
 function onResize() {
-  camera.aspect = root.clientWidth/root.clientHeight;
+  camera.aspect = chessRoot.clientWidth / chessRoot.clientHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(root.clientWidth, root.clientHeight);
+  renderer.setSize(chessRoot.clientWidth, chessRoot.clientHeight);
 }
 
-function selectPiece(mesh, pd) {
-  deselectPiece();
-  selectedMesh = mesh;
-  selectedPieceData = pd;
-  mesh.material.color.set(0x4ade80);
-  mesh.material.emissive.set(0x1a4a20);
+/* ── Selection (tint sprite material) ── */
+function selectEntry(entry) {
+  deselectEntry();
+  selectedEntry = entry;
+  entry.sprite.material.color.set(0x90eea0); // green selection tint
   const lbl = document.getElementById('piece-label');
-  document.getElementById('pl-name').textContent = pd.label;
-  const type = getPieceType(pd.id);
-  document.getElementById('pl-sub').textContent = PIECE_ICONS[type] + ' ' + type.toUpperCase();
+  document.getElementById('pl-name').textContent = entry.label;
+  document.getElementById('pl-sub').textContent  =
+    ICONS[entry.type] + ' ' + TYPE_NAMES[entry.type].toUpperCase() +
+    ' · ' + (entry.isW ? 'WHITE' : 'BLACK');
   lbl.style.display = 'block';
   lbl.style.opacity = '0';
-  lbl.style.transition = 'opacity 0.3s';
-  setTimeout(()=>lbl.style.opacity='1', 10);
+  lbl.style.transition = 'opacity 0.28s';
+  setTimeout(() => lbl.style.opacity = '1', 10);
 }
-function deselectPiece() {
-  if (selectedMesh) {
-    const isW = selectedMesh.userData.color==='white';
-    selectedMesh.material.color.set(isW ? 0x3a3a4c : 0x18181e);
-    selectedMesh.material.emissive.set(isW ? 0x151520 : 0x08080e);
-  }
-  selectedMesh = null; selectedPieceData = null;
-  document.getElementById('piece-label').style.display='none';
+function deselectEntry() {
+  if (selectedEntry) selectedEntry.sprite.material.color.set(0xffffff);
+  selectedEntry = null;
+  document.getElementById('piece-label').style.display = 'none';
 }
 
+/* ── Pages ── */
 function openPage(pageId) {
-  const page = PAGES[pageId];
-  if (!page) return;
+  const page = PAGES[pageId]; if (!page) return;
   document.getElementById('page-bg-icon').textContent = page.icon;
-  document.getElementById('page-inner').innerHTML = `
-    <div class="page-title"><span>//</span> ${page.title}</div>
-    <hr class="page-rule">
-    ${page.render()}
-  `;
+  document.getElementById('page-inner').innerHTML =
+    `<div class="page-title"><span>//</span> ${page.title}</div><hr class="page-rule">${page.render()}`;
   const ov = document.getElementById('overlay');
   ov.classList.add('active');
   ov.scrollTop = 0;
-  deselectPiece();
+  deselectEntry();
 }
-function closeOverlay() {
-  document.getElementById('overlay').classList.remove('active');
-}
+function closeOverlay() { document.getElementById('overlay').classList.remove('active'); }
 
+/* ── Animation loop ── */
 function animate() {
   requestAnimationFrame(animate);
-  animT = Date.now()*0.001;
-  camTheta += (targetTheta-camTheta)*0.07;
-  camPhi += (targetPhi-camPhi)*0.07;
-  camRadius += (targetRadius-camRadius)*0.07;
+  animT      = Date.now() * 0.001;
+  camTheta  += (tgtTheta  - camTheta)  * 0.07;
+  camPhi    += (tgtPhi    - camPhi)    * 0.07;
+  camRadius += (tgtRadius - camRadius) * 0.07;
   updateCam();
 
-  pieceMeshes.forEach((mesh, i) => {
-    const isSelected = mesh===selectedMesh;
-    const isHovered = mesh===hoveredMesh;
-    const baseY = 0.32;
-    if (isSelected) {
-      const ty = baseY + 0.22 + Math.sin(animT*2.5)*0.07;
-      mesh.position.y += (ty-mesh.position.y)*0.12;
-      mesh.rotation.y += 0.025;
-    } else if (isHovered) {
-      mesh.position.y += (baseY+0.1-mesh.position.y)*0.15;
+  const BASE_Y     = 0.58;
+  const BASE_SCALE = 0.90;
+
+  pieceMeshes.forEach(entry => {
+    const { sprite } = entry;
+    const isSel = entry === selectedEntry;
+    const isHov = entry === hoveredEntry;
+
+    if (isSel) {
+      const ty = BASE_Y + 0.28 + Math.sin(animT * 2.4) * 0.07;
+      sprite.position.y += (ty - sprite.position.y) * 0.12;
+      const s = BASE_SCALE * 1.12;
+      sprite.scale.set(s, s, 1);
+    } else if (isHov) {
+      sprite.position.y += (BASE_Y + 0.11 - sprite.position.y) * 0.14;
+      const s = BASE_SCALE * 1.05;
+      sprite.scale.set(s, s, 1);
     } else {
-      mesh.position.y += (baseY-mesh.position.y)*0.1;
-      mesh.rotation.y += 0.003;
+      sprite.position.y += (BASE_Y - sprite.position.y) * 0.09;
+      sprite.scale.set(BASE_SCALE, BASE_SCALE, 1);
     }
   });
 
   renderer.render(scene, camera);
 }
 
+/* ── Boot ── */
+async function initThree() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a0c);
+  scene.fog = new THREE.FogExp2(0x0a0a0c, 0.022);
+
+  const W = chessRoot.clientWidth, H = chessRoot.clientHeight;
+  camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
+  updateCam();
+
+  renderer = new THREE.WebGLRenderer({ canvas: chessCanvas, antialias: true });
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled  = true;
+  renderer.shadowMap.type     = THREE.PCFSoftShadowMap;
+  renderer.toneMapping        = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.10;
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0x1e1e2c, 5.5));
+
+  const key = new THREE.DirectionalLight(0xfff6e8, 2.0);
+  key.position.set(4, 14, 3);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.bias = -0.0004;
+  key.shadow.camera.near = 0.5; key.shadow.camera.far = 35;
+  key.shadow.camera.left = key.shadow.camera.bottom = -9;
+  key.shadow.camera.right = key.shadow.camera.top   =  9;
+  scene.add(key);
+
+  scene.add(Object.assign(new THREE.DirectionalLight(0xb8d8ff, 0.55), { position: new THREE.Vector3(-5, 6, -5) }));
+
+  const rim1 = new THREE.PointLight(0x4ade80, 0.50, 22); rim1.position.set(-5, 7, -6); scene.add(rim1);
+  const rim2 = new THREE.PointLight(0x4ade80, 0.22, 14); rim2.position.set( 6, 3,  6); scene.add(rim2);
+
+  // Build board first (no async needed)
+  buildBoard();
+
+  // Preload piece textures from Lichess CDN (canvas fallback built-in)
+  await loadPieceTextures();
+
+  // Use chess.js to get the exact position after move 22
+  const chess    = new Chess();
+  chess.load_pgn(GAME_PGN);
+  const allMoves = chess.history();
+  chess.reset();
+  for (let i = 0; i < 44; i++) chess.move(allMoves[i]);
+  buildPieces(chess);
+
+  raycaster = new THREE.Raycaster();
+  mouse     = new THREE.Vector2();
+
+  chessCanvas.addEventListener('mousedown', onMD);
+  chessCanvas.addEventListener('mousemove', onMM);
+  chessCanvas.addEventListener('mouseup',   onMU);
+  chessCanvas.addEventListener('click',     onCL);
+  chessCanvas.addEventListener('wheel',     onWH, { passive: true });
+  window.addEventListener('resize', onResize);
+  document.getElementById('back-btn').addEventListener('click', closeOverlay);
+
+  animate();
+}
+
+/* ═══════════════════════════════════════════════════
+   TERMINAL TYPING ENGINE
+═══════════════════════════════════════════════════ */
+const termBody   = document.getElementById('term-body');
+const termCursor = document.getElementById('term-cursor');
+const sleep      = ms => new Promise(r => setTimeout(r, ms));
+
+function scrollTerm() { termBody.scrollTop = termBody.scrollHeight; }
+
+async function typeLine(text, cls, speed = 25) {
+  const span = document.createElement('span');
+  span.className = 'tl ' + cls;
+  termBody.insertBefore(span, termCursor);
+  scrollTerm();
+  for (const ch of text) {
+    span.textContent += ch;
+    scrollTerm();
+    await sleep(speed + Math.random() * 10);
+  }
+  await sleep(55);
+}
+
+function addBlank() {
+  const span = document.createElement('span');
+  span.className = 'tl blank';
+  termBody.insertBefore(span, termCursor);
+  scrollTerm();
+}
+
+async function runTerminal() {
+  await sleep(900);
+  for (const item of TERMINAL_SCRIPT) {
+    switch (item.t) {
+      case 'cmd':   await typeLine('$ ' + item.s, 'cmd',   28); break;
+      case 'out':   await typeLine(item.s,         'out',   22); break;
+      case 'hi':    await typeLine(item.s,         'hi',    16); break;
+      case 'quote': await typeLine(item.s,         'quote', 20); break;
+      case 'move':  await typeLine(item.s,         'move',  11); break;
+      case 'key':   await typeLine(item.s,         'key',   15); break;
+      case 'now':   await typeLine(item.s,         'now',   15); break;
+      case 'b':     addBlank(); await sleep(90);  break;
+      case 'p':     await sleep(item.ms);         break;
+    }
+  }
+}
+
+/* ── Start everything ── */
+initThree();   // async — pieces appear once textures load
+runTerminal(); // starts typing immediately in parallel
 window.closeOverlay = closeOverlay;
-init();
 </script>
 </body>
 </html>

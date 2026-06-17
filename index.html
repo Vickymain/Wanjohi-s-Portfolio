@@ -4,923 +4,480 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Victor Maina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0a0a0c; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
 
-#app { display: flex; width: 100vw; height: 100vh; }
+:root {
+  --bg:       #f2ede4;
+  --bg2:      #eae5da;
+  --text:     #1a1916;
+  --muted:    #6b6660;
+  --accent:   #8b6f4a;
+  --term-bg:  #131210;
+  --term-g:   #4ade80;
+  --border:   rgba(0,0,0,0.09);
+}
 
-/* ── Chess side ── */
-#chess-side { flex: 1; position: relative; overflow: hidden; min-width: 0; }
-#chess-canvas { width: 100%; height: 100%; display: block; }
+html { scroll-behavior: smooth; }
 
-#header { position: absolute; top: 20px; left: 24px; z-index: 10; pointer-events: none; }
-#header h1 { font-size: 22px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.05em; }
-#header p  { font-size: 10px; color: #4ade80; letter-spacing: 0.15em; margin-top: 4px; opacity: 0.6; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  line-height: 1.6;
+}
 
-#hint {
-  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
-  font-size: 10px; color: #4ade80; letter-spacing: 0.12em; opacity: 0.4;
-  pointer-events: none; text-align: center; white-space: nowrap;
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
 }
-#tooltip {
-  position: absolute; pointer-events: none; z-index: 20;
-  background: rgba(10,10,12,0.92); border: 1px solid #4ade80;
-  padding: 4px 10px; font-size: 10px; color: #4ade80;
-  letter-spacing: 0.12em; display: none; white-space: nowrap;
-  backdrop-filter: blur(4px);
+.nav-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-#piece-label {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none; z-index: 15; text-align: center; display: none;
+.nav-logo {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.02em;
 }
-#piece-label .pname  { font-size: 28px; font-weight: 700; color: #e8e8e0; letter-spacing: 0.08em; text-shadow: 0 0 40px rgba(74,222,128,0.6); }
-#piece-label .psub   { font-size: 10px; color: #4ade80; letter-spacing: 0.2em; margin-top: 8px; opacity: 0.7; }
-#piece-label .pclick { font-size: 9px;  color: #4ade8066; letter-spacing: 0.15em; margin-top: 4px; }
+.nav-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--text); }
 
-/* ── Terminal side ── */
-#terminal-side {
-  width: 360px; min-width: 300px;
-  border-left: 1px solid #1a1a24;
-  display: flex; flex-direction: column;
-  background: #06060e; overflow: hidden;
+/* ── MAIN WRAPPER ── */
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
-#term-header {
-  padding: 10px 14px; border-bottom: 1px solid #141420;
-  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-}
-.term-dot { width: 10px; height: 10px; border-radius: 50%; }
-.term-dot.r { background: #ff5f57; }
-.term-dot.y { background: #febc2e; }
-.term-dot.g { background: #28c840; }
-#term-title { font-size: 10px; color: #4ade80; letter-spacing: 0.18em; margin-left: 6px; opacity: 0.7; flex: 1; text-align: center; }
-#term-body {
-  flex: 1; overflow-y: auto; padding: 14px 16px 20px;
-  font-size: 12px; line-height: 1.75; color: #a0a090;
-  scrollbar-width: thin; scrollbar-color: #1e1e2a transparent;
-}
-#term-body::-webkit-scrollbar { width: 3px; }
-#term-body::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
 
-.tl       { display: block; min-height: 1.75em; }
-.tl.cmd   { color: #4ade80; }
-.tl.out   { color: #7a8a7a; }
-.tl.hi    { color: #e8e8e0; }
-.tl.quote { color: #6ee7b7; font-style: italic; }
-.tl.move  { color: #5a6a5a; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
-.tl.key   { color: #fbbf24; font-weight: 700; }
-.tl.now   { color: #60a5fa; }
-.tl.blank { min-height: 0.7em; }
-.cursor-blink {
-  display: inline-block; width: 7px; height: 13px;
-  background: #4ade80; vertical-align: middle;
-  animation: cblink 1s step-end infinite; margin-left: 1px;
+/* ── HERO ── */
+.hero {
+  padding: 80px 0 56px;
 }
-@keyframes cblink { 0%,100%{opacity:1} 50%{opacity:0} }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.9em;
+  background: var(--text);
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+  margin-left: 3px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-/* ── Page overlay ── */
-#overlay {
-  position: fixed; inset: 0; z-index: 50; display: none;
-  background: #0a0a0c; overflow-y: auto;
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 36px;
 }
-#overlay.active { display: flex; flex-direction: column; }
-.page-bg {
-  position: absolute; inset: 0; opacity: 0.04; font-size: 300px;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: none; overflow: hidden; user-select: none; line-height: 1;
-}
-.page-content { position: relative; z-index: 2; padding: 32px 40px; flex: 1; max-width: 900px; }
-.page-back {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px; color: #4ade80; letter-spacing: 0.15em; cursor: pointer;
-  border: 1px solid #4ade8055; padding: 6px 14px; margin-bottom: 32px;
-  background: transparent; font-family: 'Courier New', monospace;
-  transition: background 0.2s, border-color 0.2s;
-}
-.page-back:hover { background: rgba(74,222,128,0.08); border-color: #4ade80; }
-.page-title { font-size: 28px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; letter-spacing: 0.04em; }
-.page-title span { color: #4ade80; }
-.page-rule { border: none; border-top: 1px solid #4ade8030; margin-bottom: 28px; }
-.terminal-block { background: #0e0e12; border: 1px solid #1e1e26; padding: 24px; font-size: 13px; color: #c8c8c0; line-height: 1.9; margin-bottom: 20px; }
-.terminal-block .prompt { color: #4ade80; margin-right: 8px; }
-.terminal-block .comment { color: #3a3a4a; }
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; }
-.project-card { background: #0e0e12; border: 1px solid #1e1e26; padding: 18px; transition: border-color 0.2s; }
-.project-card:hover { border-color: #4ade8066; }
-.project-card .pc-icon  { font-size: 22px; margin-bottom: 10px; }
-.project-card .pc-title { font-size: 13px; font-weight: 700; color: #e8e8e0; margin-bottom: 6px; }
-.project-card .pc-desc  { font-size: 12px; color: #666; line-height: 1.6; }
-.project-card .pc-tag   { display: inline-block; font-size: 10px; color: #4ade80; border: 1px solid #4ade8033; padding: 2px 7px; margin-top: 10px; letter-spacing: 0.1em; }
-.list-items { list-style: none; }
-.list-items li { padding: 9px 0; border-bottom: 1px solid #141418; font-size: 13px; color: #c8c8c0; display: flex; align-items: baseline; gap: 10px; }
-.list-items li::before { content: '—'; color: #4ade80; flex-shrink: 0; }
-.exp-item { margin-bottom: 20px; padding-left: 16px; border-left: 2px solid #4ade8030; }
-.exp-item .role { font-size: 14px; color: #e8e8e0; font-weight: 700; }
-.exp-item .org  { font-size: 11px; color: #4ade80; letter-spacing: 0.12em; margin: 4px 0; }
-.exp-item .note { font-size: 12px; color: #555; }
-.contact-row { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid #141418; }
-.contact-row .cr-label { font-size: 11px; color: #4ade80; letter-spacing: 0.14em; min-width: 80px; }
-.contact-row .cr-val   { font-size: 13px; color: #c8c8c0; }
-.uses-section { margin-bottom: 16px; }
-.uses-section .us-cat { font-size: 11px; color: #4ade80; letter-spacing: 0.16em; margin-bottom: 6px; }
 
-@media (max-width: 900px) {
-  #app { flex-direction: column; }
-  #chess-side { height: 58vh; }
-  #terminal-side { width: 100%; min-width: 0; border-left: none; border-top: 1px solid #1a1a24; height: 42vh; }
+/* ── TERMINAL ── */
+.terminal {
+  background: var(--term-bg);
+  border-radius: 5px;
+  padding: 22px 26px 20px;
+  font-size: 12.5px;
+  line-height: 1.9;
+  max-width: 580px;
+  margin-bottom: 40px;
+  overflow-y: auto;
+  max-height: 280px;
+  scrollbar-width: none;
+}
+.terminal::-webkit-scrollbar { display: none; }
+
+.t-cmd   { display: block; color: var(--term-g); }
+.t-out   { display: block; color: #596857; }
+.t-move  { display: block; color: #4a5a4a; }
+.t-key   { display: block; color: #f59e0b; }
+.t-now   { display: block; color: #60a5fa; }
+.t-quote { display: block; color: #86efac; font-style: italic; }
+.t-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 12px;
+  background: var(--term-g);
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+/* ── BUTTONS ── */
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 22px;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  display: inline-block;
+}
+.btn-fill {
+  background: var(--accent);
+  color: #f5efe6;
+  border: 1px solid var(--accent);
+}
+.btn-fill:hover { background: #7a5f3e; border-color: #7a5f3e; }
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(0,0,0,0.22);
+}
+.btn-outline:hover { border-color: var(--text); }
+
+/* ── SECTIONS ── */
+.section {
+  padding: 60px 0;
+  border-top: 1px solid var(--border);
+}
+.section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  letter-spacing: -0.01em;
+}
+
+/* ── ABOUT ── */
+.about-text {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 2;
+  max-width: 580px;
+}
+.about-text strong { color: var(--text); font-weight: 700; }
+.about-text p + p { margin-top: 14px; }
+
+/* ── PROJECTS ── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.project-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.project-card:hover { border-color: rgba(139,111,74,0.55); background: #e5dfd4; }
+.pc-tag   { font-size: 10px; color: var(--accent); letter-spacing: 0.14em; margin-bottom: 7px; display: block; }
+.pc-title { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+.pc-desc  { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+/* ── EXPERIENCE ── */
+.exp-list { display: flex; flex-direction: column; }
+.exp-item {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 20px;
+}
+.exp-item:first-child { border-top: none; }
+.exp-date { font-size: 11.5px; color: var(--muted); padding-top: 2px; }
+.exp-role { font-size: 13.5px; font-weight: 700; margin-bottom: 3px; }
+.exp-org  { font-size: 11.5px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px; }
+.exp-note { font-size: 12.5px; color: var(--muted); line-height: 1.75; }
+
+/* ── CONTACT ── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.contact-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+}
+.c-label { font-size: 10px; color: var(--accent); letter-spacing: 0.14em; margin-bottom: 4px; }
+.c-val   { font-size: 13px; color: var(--text); }
+.contact-note { font-size: 12px; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 22px 0;
+}
+.footer-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 32px;
+  font-size: 11.5px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+  .hero { padding: 48px 0 36px; }
+  .exp-item { grid-template-columns: 1fr; gap: 2px; }
+  .exp-date { order: -1; }
 }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- Chess -->
-  <div id="chess-side">
-    <div id="header">
-      <h1>Victor<span style="color:#4ade80"> </span>Maina<span style="animation:cblink 1.2s step-end infinite;display:inline-block;color:#4ade80">_</span></h1>
-      <p>// SELECT A PIECE TO NAVIGATE</p>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">victor.maina</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Victor Maina<span class="cursor"></span></h1>
+    <p class="hero-sub">Software Engineer &amp; Chess Enthusiast</p>
+
+    <div class="terminal" id="term-box">
+      <span class="t-cursor" id="term-cursor"></span>
     </div>
-    <canvas id="chess-canvas"></canvas>
-    <div id="hint">DRAG TO ROTATE &nbsp;·&nbsp; SCROLL TO ZOOM &nbsp;·&nbsp; CLICK PIECE → SELECT &nbsp;·&nbsp; CLICK AGAIN → OPEN</div>
-    <div id="tooltip"></div>
-    <div id="piece-label">
-      <div class="pname" id="pl-name"></div>
-      <div class="psub"  id="pl-sub"></div>
-      <div class="pclick">CLICK AGAIN TO OPEN →</div>
+
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-fill">View Projects</a>
+      <a href="https://github.com/Vickymain" class="btn btn-outline" target="_blank" rel="noopener">GitHub Profile</a>
     </div>
   </div>
 
-  <!-- Terminal -->
-  <div id="terminal-side">
-    <div id="term-header">
-      <div class="term-dot r"></div>
-      <div class="term-dot y"></div>
-      <div class="term-dot g"></div>
-      <span id="term-title">CHESS-REPLAY v2.0</span>
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2>About</h2>
+    <div class="about-text">
+      <p>
+        I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>,
+        studying Computer Science at Maseno University since 2022.
+        I build clean, meaningful software — from full-stack web applications to AI-driven tools.
+      </p>
+      <p>
+        Outside of code, I'm a <strong>chess enthusiast</strong>. The game sharpens pattern
+        recognition and long-term planning — skills that transfer directly to engineering.
+        Currently ~1000 ELO on chess.com, with IM level as the long-term goal.
+      </p>
+      <p>
+        The terminal above replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong>
+        — widely considered one of the most brilliant games in modern chess history.
+      </p>
     </div>
-    <div id="term-body">
-      <span class="cursor-blink" id="term-cursor"></span>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <h2>Projects</h2>
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <span class="pc-tag">WEB · FULL-STACK</span>
+        <div class="pc-title">PoshPoint</div>
+        <div class="pc-desc">Full-stack web application with a sophisticated UI and robust backend architecture.</div>
+      </div>
+
+      <div class="project-card">
+        <span class="pc-tag">PHP · REAL-TIME</span>
+        <div class="pc-title">QuickDrop</div>
+        <div class="pc-desc">Fast delivery platform connecting users to real-time logistics services.</div>
+      </div>
+
+      <div class="project-card">
+        <span class="pc-tag">JS · COMMUNITY</span>
+        <div class="pc-title">Ring Africa</div>
+        <div class="pc-desc">Open platform celebrating and connecting African communities and innovation.</div>
+      </div>
+
+      <div class="project-card">
+        <span class="pc-tag">PYTHON · ML</span>
+        <div class="pc-title">ML Experiments</div>
+        <div class="pc-desc">Machine learning models and AI-driven explorations — notebooks and scripts.</div>
+      </div>
+
+      <div class="project-card">
+        <span class="pc-tag">BASH · TOOLS</span>
+        <div class="pc-title">shell-tools</div>
+        <div class="pc-desc">Shell scripts and automation tools for a faster developer workflow.</div>
+      </div>
+
+      <div class="project-card">
+        <span class="pc-tag">THREE.JS · CHESS</span>
+        <div class="pc-title">Chess Portfolio</div>
+        <div class="pc-desc">This portfolio — chess-themed, interactive, built entirely from scratch.</div>
+      </div>
+
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- Page overlay -->
-<div id="overlay">
-  <div class="page-bg" id="page-bg-icon"></div>
-  <div class="page-content">
-    <button class="page-back" id="back-btn">← BACK TO BOARD</button>
-    <div id="page-inner"></div>
-  </div>
-</div>
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <h2>Experience</h2>
+    <div class="exp-list">
 
-<!-- Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+      <div class="exp-item">
+        <div class="exp-date">2022 — present</div>
+        <div>
+          <div class="exp-role">Computer Science Student</div>
+          <div class="exp-org">Maseno University</div>
+          <div class="exp-note">Algorithms, data structures, software engineering, and a growing focus on AI and machine learning.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2022 — present</div>
+        <div>
+          <div class="exp-role">Freelance Web Developer</div>
+          <div class="exp-org">Independent</div>
+          <div class="exp-note">Full-stack web applications for clients — from design through deployment. JavaScript, PHP, Python.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2023 — present</div>
+        <div>
+          <div class="exp-role">Open Source Contributor</div>
+          <div class="exp-org">GitHub · @Vickymain</div>
+          <div class="exp-note">Personal tools, experiments, and contributions to open source projects.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <h2>Contact</h2>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="c-label">EMAIL</div>
+        <div class="c-val">wanjohi.vmaina@gmail.com</div>
+      </div>
+      <div class="contact-item">
+        <div class="c-label">GITHUB</div>
+        <div class="c-val">github.com/Vickymain</div>
+      </div>
+      <div class="contact-item">
+        <div class="c-label">CHESS</div>
+        <div class="c-val">chess.com · ~1000 ELO</div>
+      </div>
+      <div class="contact-item">
+        <div class="c-label">LOCATION</div>
+        <div class="c-val">Nairobi, Kenya</div>
+      </div>
+    </div>
+    <p class="contact-note"># Email preferred for project inquiries and collaborations.</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>Victor Maina · Nairobi, Kenya</span>
+    <span>2025</span>
+  </div>
+</footer>
+
 <script>
-/* ═══════════════════════════════════════════════════
-   GAME DATA — Caruana vs Aronian, Candidates 2014
-   Position: after move 22 (22...Nf8)
-═══════════════════════════════════════════════════ */
-const GAME_PGN = `[Event "Candidates 2014"]
-[Site "Khanty-Mansiysk RUS"]
-[Date "2014.03.14"]
-[White "Caruana, F"]
-[Black "Aronian, L"]
-[Result "1-0"]
-1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. d3 b5 7. Bb3 d6
-8. a3 O-O 9. Nc3 Nb8 10. Ne2 Nbd7 11. Ng3 Nc5 12. Ba2 c5 13. b4 Ne6
-14. c3 g6 15. d4 cxd4 16. cxd4 Nf4 17. d5 Nd7 18. Bxf4 exf4 19. Nf5 gxf5
-20. exf5 Bf6 21. Re1 Re8 22. Nd4 Nf8 23. Nxf5 Ng6 24. f3 Qd7 25. Qd3 b4
-26. axb4 a5 27. bxa5 Rxa5 28. Bb1 Bh4 29. Re4 Rxa1 30. Rxa1 f3 31. g3 Bxg3
-32. hxg3 fxg3 33. Rxg3 Nxf4 34. Qe3 Ng2 35. Qh3 Nf4 36. Qh4 Ng6 37. fxg6
-hxg6 38. Qxg6+ Kh8 39. Rg5 Re5 40. Rxe5 dxe5 41. Qh5+ Kg7 42. Bxf5 Qc6
-43. Be4 Qc3 44. Bf5 1-0`;
-
-const PAGE_BY_TYPE       = { k:'about', q:'skills', b:'projects', n:'exp',      r:'blog',    p:'contact' };
-const PAGE_BY_TYPE_BLACK = { k:'about', q:'skills', b:'open',     n:'uses',     r:'contact', p:'blog'    };
-const LABEL_BY_TYPE      = { k:'ABOUT ME', q:'SKILLS', b:'PROJECTS', n:'EXPERIENCE', r:'BLOG',    p:'CONTACT'    };
-const LABEL_BY_TYPE_BLACK= { k:'ABOUT ME', q:'SKILLS', b:'OPEN SOURCE', n:'USES', r:'CONTACT', p:'BLOG'       };
-const ICONS      = { k:'♚', q:'♛', b:'♝', n:'♞', r:'♜', p:'♟' };
-const TYPE_NAMES = { k:'King', q:'Queen', b:'Bishop', n:'Knight', r:'Rook', p:'Pawn' };
-
-/* ═══════════════════════════════════════════════════
-   TERMINAL SCRIPT
-═══════════════════════════════════════════════════ */
-const TERMINAL_SCRIPT = [
-  {t:'cmd',  s:'chess-replay --pgn "candidates-2014"'},
-  {t:'p',    ms:700},
-  {t:'out',  s:'Loading PGN from game database...'},
-  {t:'p',    ms:1000},
-  {t:'out',  s:'Validated. 44 moves. Result: 1-0'},
-  {t:'b'},
-  {t:'hi',   s:'╔══════════════════════════════════╗'},
-  {t:'hi',   s:'║  FIDE CANDIDATES TOURNAMENT 2014 ║'},
-  {t:'hi',   s:'╚══════════════════════════════════╝'},
-  {t:'b'},
-  {t:'hi',   s:'  WHITE ♔  Fabiano Caruana  (ITA)'},
-  {t:'hi',   s:'  BLACK ♚  Levon Aronian    (ARM)'},
-  {t:'b'},
-  {t:'out',  s:'  Event   : FIDE Candidates 2014'},
-  {t:'out',  s:'  Location: Khanty-Mansiysk, Russia'},
-  {t:'out',  s:'  Date    : March 14, 2014'},
-  {t:'out',  s:'  Opening : Ruy Lopez (C78)'},
-  {t:'out',  s:'  Result  : 1-0  (White wins)'},
-  {t:'b'},
-  {t:'quote',s:'  "This was my best game ever."'},
-  {t:'quote',s:'     — Fabiano Caruana'},
-  {t:'b'},
-  {t:'cmd',  s:'show-moves --annotate --position 22'},
-  {t:'p',    ms:500},
-  {t:'out',  s:'Board showing position after move 22.'},
-  {t:'b'},
-  {t:'hi',   s:'─── MOVE LIST ────────────────────'},
-  {t:'b'},
-  {t:'move', s:' 1.  e4          e5'},
-  {t:'move', s:' 2.  Nf3         Nc6'},
-  {t:'move', s:' 3.  Bb5         a6'},
-  {t:'move', s:' 4.  Ba4         Nf6'},
-  {t:'move', s:' 5.  O-O         Be7'},
-  {t:'move', s:' 6.  d3          b5'},
-  {t:'move', s:' 7.  Bb3         d6'},
-  {t:'move', s:' 8.  a3          O-O'},
-  {t:'move', s:' 9.  Nc3         Nb8'},
-  {t:'move', s:'10.  Ne2         Nbd7'},
-  {t:'move', s:'11.  Ng3         Nc5'},
-  {t:'move', s:'12.  Ba2         c5'},
-  {t:'move', s:'13.  b4          Ne6'},
-  {t:'move', s:'14.  c3          g6'},
-  {t:'move', s:'15.  d4          cxd4'},
-  {t:'move', s:'16.  cxd4        Nf4'},
-  {t:'move', s:'17.  d5          Nd7'},
-  {t:'move', s:'18.  Bxf4        exf4'},
-  {t:'key',  s:'19.  Nf5!! ★    gxf5   ← The brilliant sacrifice'},
-  {t:'move', s:'20.  exf5        Bf6'},
-  {t:'move', s:'21.  Re1         Re8'},
-  {t:'now',  s:'22.  Nd4  ◄     Nf8   ← Position on board'},
-  {t:'move', s:'23.  Nxf5        Ng6'},
-  {t:'move', s:'24.  f3          Qd7'},
-  {t:'move', s:'25.  Qd3         b4'},
-  {t:'move', s:'26.  axb4        a5'},
-  {t:'move', s:'27.  bxa5        Rxa5'},
-  {t:'move', s:'28.  Bb1         Bh4'},
-  {t:'move', s:'29.  Re4         Rxa1'},
-  {t:'move', s:'30.  Rxa1        f3'},
-  {t:'move', s:'31.  g3          Bxg3'},
-  {t:'move', s:'32.  hxg3        fxg3'},
-  {t:'move', s:'33.  Rxg3        Nxf4'},
-  {t:'move', s:'34.  Qe3         Ng2'},
-  {t:'move', s:'35.  Qh3         Nf4'},
-  {t:'move', s:'36.  Qh4         Ng6'},
-  {t:'move', s:'37.  fxg6        hxg6'},
-  {t:'move', s:'38.  Qxg6+       Kh8'},
-  {t:'move', s:'39.  Rg5         Re5'},
-  {t:'move', s:'40.  Rxe5        dxe5'},
-  {t:'move', s:'41.  Qh5+        Kg7'},
-  {t:'move', s:'42.  Bxf5        Qc6'},
-  {t:'move', s:'43.  Be4         Qc3'},
-  {t:'key',  s:'44.  Bf5         1-0  ✓  Caruana wins!'},
-  {t:'b'},
-  {t:'out',  s:'Game complete. A masterpiece of chess.'},
-  {t:'cmd',  s:'_'},
-];
-
-/* ═══════════════════════════════════════════════════
-   PAGE CONTENT
-═══════════════════════════════════════════════════ */
-const PAGES = {
-  about: {
-    icon:'♚', title:'About Me',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>whoami</div>
-        <div style="margin-top:10px;color:#e8e8e0;font-size:15px;font-weight:700;">Victor Maina</div>
-        <div style="margin-top:10px;color:#3a3a4a;"># Software Engineer · Chess Enthusiast · Builder</div>
-        <div style="margin-top:16px;color:#c8c8c0;line-height:2;">
-          I build clean, meaningful software — from web applications to AI-driven tools.<br>
-          Based in Nairobi, Kenya. Studying Computer Science at Maseno University since 2022.<br>
-          Passionate about chess: the board you see is Caruana vs Aronian, Candidates 2014.
-        </div>
-        <div style="margin-top:18px;"><span class="prompt">$</span>echo $CHESS_RATING</div>
-        <div style="margin-top:8px;color:#c8c8c0;">~1000 ELO on chess.com · the journey never stops · IM level is the goal</div>
-        <div style="margin-top:18px;"><span class="prompt">$</span>echo $LOCATION</div>
-        <div style="margin-top:8px;color:#4ade80;">Nairobi, Kenya 🌍</div>
-      </div>`
-  },
-  skills: {
-    icon:'♛', title:'Skills',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>ls -la skills/</div>
-        <div style="margin-top:16px;">
-          ${[
-            ['Languages','JavaScript, Python, PHP, C / C++, TypeScript'],
-            ['Frontend','HTML5, CSS3, React, Next.js, Tailwind CSS'],
-            ['Backend','Node.js, Express, Django, Laravel, REST APIs'],
-            ['Database','MySQL, PostgreSQL, SQLite'],
-            ['Tools','Git, GitHub, Docker, VS Code, Cursor, Linux'],
-            ['Learning','Machine Learning, AI, Rust, Three.js'],
-          ].map(([cat,items])=>`
-            <div style="margin-bottom:14px;">
-              <div style="font-size:11px;color:#4ade80;letter-spacing:0.14em;margin-bottom:5px;">${cat.toUpperCase()}/</div>
-              <ul class="list-items"><li>${items}</li></ul>
-            </div>`).join('')}
-        </div>
-      </div>`
-  },
-  projects: {
-    icon:'♝', title:'Projects',
-    render: () => `
-      <div class="cards-grid">
-        ${[
-          {title:'POSHPOINT',desc:'Full-stack web application with sophisticated UI and backend.',tag:'WEB',icon:'🌐'},
-          {title:'QUICKDROP',desc:'Fast delivery platform connecting users to real-time services.',tag:'PHP',icon:'⚡'},
-          {title:'Ring Africa',desc:'Community platform showcasing African innovation.',tag:'JS',icon:'🌍'},
-          {title:'Chess Portfolio',desc:'This portfolio — 3D chess board with Three.js + chess.js.',tag:'THREE.JS',icon:'♛'},
-          {title:'ML Experiments',desc:'Machine learning models and AI-driven explorations.',tag:'PYTHON',icon:'🤖'},
-          {title:'Open Projects',desc:'Various open source tools and experiments on GitHub.',tag:'OSS',icon:'📦'},
-        ].map(p=>`
-          <div class="project-card">
-            <div class="pc-icon">${p.icon}</div>
-            <div class="pc-title">${p.title}</div>
-            <div class="pc-desc">${p.desc}</div>
-            <div class="pc-tag">${p.tag}</div>
-          </div>`).join('')}
-      </div>`
-  },
-  exp: {
-    icon:'♞', title:'Experience',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>cat experience.log</div>
-        <div style="margin-top:20px;">
-          ${[
-            {role:'Computer Science Student',org:'Maseno University · 2022 — present',note:'Algorithms, data structures, software engineering, and growing AI focus.'},
-            {role:'Freelance Web Developer',org:'Self · 2022 — present',note:'Full-stack web apps for clients — design through deployment.'},
-            {role:'Open Source Contributor',org:'GitHub · 2023 — present',note:'Personal tools and contributions to open source projects.'},
-            {role:'Chess Enthusiast',org:'chess.com · ongoing',note:'Strategic thinking and pattern recognition — lessons that transfer directly to code.'},
-          ].map(e=>`
-            <div class="exp-item">
-              <div class="role">${e.role}</div>
-              <div class="org">${e.org}</div>
-              <div class="note">${e.note}</div>
-            </div>`).join('')}
-        </div>
-      </div>`
-  },
-  contact: {
-    icon:'♜', title:'Contact',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>cat contact.json</div>
-        <div style="margin-top:16px;">
-          ${[
-            {label:'EMAIL',   val:'wanjohi.vmaina@gmail.com'},
-            {label:'GITHUB',  val:'github.com/Vickymain'},
-            {label:'CHESS',   val:'chess.com  ·  ~1000 ELO'},
-            {label:'LOCATION',val:'Nairobi, Kenya'},
-          ].map(c=>`
-            <div class="contact-row">
-              <div class="cr-label">${c.label}</div>
-              <div class="cr-val">${c.val}</div>
-            </div>`).join('')}
-        </div>
-        <div style="margin-top:20px;color:#3a3a4a;font-size:11px;"># Email preferred for project inquiries and collaborations.</div>
-      </div>`
-  },
-  blog: {
-    icon:'♟', title:'Blog',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>ls posts/ | sort -r</div>
-        <div style="margin-top:12px;">
-          <ul class="list-items">
-            ${[
-              ['2024-12-01','Why chess and coding are the same discipline'],
-              ['2024-09-15','Building my first Django application from scratch'],
-              ['2024-06-20','What Caruana vs Aronian 2014 teaches about planning'],
-              ['2024-03-10','Getting started with Machine Learning in Python'],
-              ['2023-11-05','The power of open source — my first contribution'],
-              ['2023-07-22','From zero to 1000 ELO — lessons from chess.com'],
-            ].map(([date,title])=>`
-              <li>
-                <span style="color:#333;font-size:11px;min-width:90px;flex-shrink:0;">${date}</span>
-                <span>${title}</span>
-              </li>`).join('')}
-          </ul>
-        </div>
-      </div>`
-  },
-  open: {
-    icon:'♝', title:'Open Source',
-    render: () => `
-      <div class="cards-grid">
-        ${[
-          {title:'chess-portfolio',desc:'This portfolio — open source 3D interactive chess built with Three.js.',tag:'JS',icon:'♛'},
-          {title:'Ring Africa',desc:'Open platform celebrating and connecting African communities.',tag:'WEB',icon:'🌍'},
-          {title:'ML Notebooks',desc:'Public notebooks exploring ML and AI concepts.',tag:'PYTHON',icon:'📓'},
-          {title:'shell-tools',desc:'Shell scripts and automation tools for the developer workflow.',tag:'BASH',icon:'📜'},
-        ].map(p=>`
-          <div class="project-card">
-            <div class="pc-icon">${p.icon}</div>
-            <div class="pc-title">${p.title}</div>
-            <div class="pc-desc">${p.desc}</div>
-            <div class="pc-tag">${p.tag}</div>
-          </div>`).join('')}
-      </div>`
-  },
-  uses: {
-    icon:'♞', title:'Uses',
-    render: () => `
-      <div class="terminal-block">
-        <div><span class="prompt">$</span>cat uses.md</div>
-        <div style="margin-top:20px;">
-          ${[
-            {cat:'Editor',items:['VS Code (primary)','Cursor (AI-assisted)','Vim (terminal)']},
-            {cat:'Languages',items:['JavaScript / Python (daily)','PHP (backend)','HTML + CSS (frontend)']},
-            {cat:'Shell',items:['PowerShell (Windows)','Bash / WSL (Linux)','Git CLI']},
-            {cat:'Hardware',items:['Windows 11 PC','External monitor','Mechanical keyboard']},
-            {cat:'Chess',items:['chess.com (online)','Lichess (analysis)','Physical Staunton set']},
-            {cat:'Tools',items:['GitHub','Figma','Postman']},
-          ].map(s=>`
-            <div class="uses-section">
-              <div class="us-cat">${s.cat.toUpperCase()}/</div>
-              <ul class="list-items">${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
-            </div>`).join('')}
-        </div>
-      </div>`
-  },
-};
-
-/* ═══════════════════════════════════════════════════
-   PIECE TEXTURES
-   Primary: Lichess cburnett SVGs (open source, free)
-   Fallback: canvas-drawn pieces
-═══════════════════════════════════════════════════ */
-
-// Lichess cburnett piece set — same pieces used on Lichess.org broadcasts
-const LICHESS_BASE  = 'https://lichess1.org/assets/piece/cburnett/';
-const PIECE_CODES   = ['wK','wQ','wR','wB','wN','wP','bK','bQ','bR','bB','bN','bP'];
-const pieceTex      = {};
-
-function makeCanvasTex(code) {
-  const isW  = code[0] === 'w';
-  const type = code[1];
-  const syms = { K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙' };
-  const symB = { K:'♚', Q:'♛', R:'♜', B:'♝', N:'♞', P:'♟' };
-  const sym  = isW ? syms[type] : symB[type];
-
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const ctx = c.getContext('2d');
-  ctx.clearRect(0, 0, 256, 256);
-
-  // Drop shadow
-  ctx.shadowColor  = 'rgba(0,0,0,0.65)';
-  ctx.shadowBlur   = 18;
-  ctx.shadowOffsetX = 3;
-  ctx.shadowOffsetY = 5;
-
-  ctx.font         = 'bold 192px serif';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
-
-  // Outline pass
-  ctx.strokeStyle = isW ? '#3a200e' : '#b8802a';
-  ctx.lineWidth   = 10;
-  ctx.strokeText(sym, 128, 136);
-
-  ctx.shadowColor = 'transparent';
-
-  // Fill pass
-  ctx.fillStyle = isW ? '#f2e8d0' : '#1e1008';
-  ctx.fillText(sym, 128, 136);
-
-  const tex       = new THREE.CanvasTexture(c);
-  tex.needsUpdate = true;
-  return tex;
-}
-
-async function loadPieceTextures() {
-  const loader = new THREE.TextureLoader();
-
-  await Promise.all(PIECE_CODES.map(code => new Promise(resolve => {
-    // Try Lichess CDN first
-    loader.load(
-      LICHESS_BASE + code + '.svg',
-      tex => { pieceTex[code] = tex; resolve(); },
-      undefined,
-      () => {
-        // Lichess failed — use canvas fallback
-        pieceTex[code] = makeCanvasTex(code);
-        resolve();
-      }
-    );
-  })));
-}
-
-/* ═══════════════════════════════════════════════════
-   THREE.JS — BOARD & PIECE SPRITES
-═══════════════════════════════════════════════════ */
-const chessRoot   = document.getElementById('chess-side');
-const chessCanvas = document.getElementById('chess-canvas');
-
-let scene, camera, renderer, raycaster, mouse;
-let pieceMeshes   = [];   // { sprite, type, isW, label, page }
-let selectedEntry = null;
-let hoveredEntry  = null;
-let isDragging    = false, prevMouse = {x:0,y:0};
-let camTheta = Math.PI*0.28, camPhi = 1.00, camRadius = 13.5;
-let tgtTheta = camTheta, tgtPhi = camPhi, tgtRadius = camRadius;
-let animT    = 0;
-
-/* ── Board square texture (chess.com maple/rosewood palette) ── */
-function makeSquareTex(isLight) {
-  const C   = document.createElement('canvas');
-  C.width = C.height = 128;
-  const ctx = C.getContext('2d');
-
-  // Base colour — chess.com's classic wood palette
-  ctx.fillStyle = isLight ? '#f0d9b5' : '#b58863';
-  ctx.fillRect(0, 0, 128, 128);
-
-  // Subtle grain lines
-  for (let i = 0; i < 18; i++) {
-    const cx = Math.random() * 150 - 10;
-    ctx.strokeStyle = isLight
-      ? `rgba(150,105,55,${0.05 + Math.random() * 0.09})`
-      : `rgba(60,30,8,${0.07 + Math.random() * 0.12})`;
-    ctx.lineWidth = 0.6 + Math.random() * 1.4;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.random() * 12 - 6, 0);
-    ctx.bezierCurveTo(
-      cx + Math.random() * 24 - 12, 40,
-      cx + Math.random() * 24 - 12, 88,
-      cx + Math.random() * 12 - 6, 128
-    );
-    ctx.stroke();
-  }
-
-  const tex        = new THREE.CanvasTexture(C);
-  tex.needsUpdate  = true;
-  return tex;
-}
-
-function makeBorderTex() {
-  const C   = document.createElement('canvas');
-  C.width = C.height = 128;
-  const ctx = C.getContext('2d');
-  ctx.fillStyle = '#3a1a08';
-  ctx.fillRect(0, 0, 128, 128);
-  for (let i = 0; i < 14; i++) {
-    const x = Math.random() * 140 - 6;
-    ctx.strokeStyle = `rgba(22,8,2,${0.12 + Math.random() * 0.18})`;
-    ctx.lineWidth   = 1 + Math.random() * 2.5;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.bezierCurveTo(x + Math.random() * 20 - 10, 42, x + Math.random() * 20 - 10, 86, x + Math.random() * 12 - 6, 128);
-    ctx.stroke();
-  }
-  return new THREE.CanvasTexture(C);
-}
-
-/* ── Board geometry ── */
-function buildBoard() {
-  const lightTex  = makeSquareTex(true);
-  const darkTex   = makeSquareTex(false);
-  const borderTex = makeBorderTex();
-
-  // 8×8 squares
-  const sqGeo = new THREE.BoxGeometry(1, 0.10, 1);
-  for (let col = 0; col < 8; col++) {
-    for (let row = 0; row < 8; row++) {
-      const isLight = (col + row) % 2 === 0;
-      const mat = new THREE.MeshStandardMaterial({
-        map:       isLight ? lightTex : darkTex,
-        roughness: 0.75,
-        metalness: 0.02,
-      });
-      const m = new THREE.Mesh(sqGeo, mat);
-      m.position.set(col - 3.5, 0, row - 3.5);
-      m.receiveShadow = true;
-      scene.add(m);
-    }
-  }
-
-  // Walnut border frame
-  const borderMat = new THREE.MeshStandardMaterial({ map: borderTex, roughness: 0.88 });
-  scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.14, 10.6), borderMat), { position: new THREE.Vector3(0, -0.03, 0) }));
-
-  // Inner cherry rail
-  const railMat = new THREE.MeshStandardMaterial({ color: 0x6B3A1F, roughness: 0.72 });
-  scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(8.28, 0.12, 8.28), railMat), { position: new THREE.Vector3(0, -0.02, 0) }));
-
-  // Base slab
-  const slabMat = new THREE.MeshStandardMaterial({ color: 0x1e0a04, roughness: 0.95 });
-  const slab = new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.20, 10.6), slabMat);
-  slab.position.y = -0.18;
-  slab.receiveShadow = true;
-  scene.add(slab);
-
-  // Bevel edge highlight
-  const edgeMat = new THREE.MeshStandardMaterial({ color: 0x8B4E12, roughness: 0.62, metalness: 0.05 });
-  for (let s = 0; s < 4; s++) {
-    const a = s * (Math.PI / 2);
-    const edge = new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.06, 0.26), edgeMat);
-    edge.position.set(Math.sin(a) * 5.17, 0.05, Math.cos(a) * 5.17);
-    edge.rotation.y = a;
-    scene.add(edge);
-  }
-}
-
-/* ── Place pieces as sprites from chess.js board state ── */
-function buildPieces(chess) {
-  // Remove old sprites
-  pieceMeshes.forEach(e => scene.remove(e.sprite));
-  pieceMeshes = [];
-
-  const board = chess.board();
-  // board[row][col]: row 0 = rank 8, col 0 = file a
-  // Three.js: x = col − 3.5, z = row − 3.5  (rank8 far/z=-3.5, rank1 near/z=3.5)
-
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const sq = board[row][col];
-      if (!sq) continue;
-
-      const isW  = sq.color === 'w';
-      const code = (isW ? 'w' : 'b') + sq.type.toUpperCase();
-      const tex  = pieceTex[code] || makeCanvasTex(code);
-
-      const mat = new THREE.SpriteMaterial({
-        map:         tex,
-        transparent: true,
-        sizeAttenuation: true,
-      });
-      const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(0.90, 0.90, 1);
-      sprite.position.set(col - 3.5, 0.58, row - 3.5);
-      sprite.renderOrder = 1;
-      scene.add(sprite);
-
-      const label = isW ? LABEL_BY_TYPE[sq.type] : LABEL_BY_TYPE_BLACK[sq.type];
-      const page  = isW ? PAGE_BY_TYPE[sq.type]  : PAGE_BY_TYPE_BLACK[sq.type];
-      pieceMeshes.push({ sprite, type: sq.type, isW, label, page });
-    }
-  }
-}
-
-/* ── Camera ── */
-function updateCam() {
-  const x = camRadius * Math.sin(camPhi) * Math.sin(camTheta);
-  const y = camRadius * Math.cos(camPhi);
-  const z = camRadius * Math.sin(camPhi) * Math.cos(camTheta);
-  camera.position.set(x, y, z);
-  camera.lookAt(0, 0.5, 0);
-}
-
-/* ── Raycasting against sprites ── */
-function getHit(e) {
-  const r = chessRoot.getBoundingClientRect();
-  mouse.set(
-    ((e.clientX - r.left) / r.width)  *  2 - 1,
-    -((e.clientY - r.top)  / r.height) *  2 + 1
-  );
-  raycaster.setFromCamera(mouse, camera);
-  const sprites = pieceMeshes.map(e => e.sprite);
-  const hits    = raycaster.intersectObjects(sprites);
-  if (!hits.length) return null;
-  const hit = hits[0].object;
-  return pieceMeshes.find(e => e.sprite === hit) || null;
-}
-
-/* ── Mouse events ── */
-function onMD(e) { isDragging = false; prevMouse = {x:e.clientX, y:e.clientY}; }
-function onMM(e) {
-  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
-  if (e.buttons === 1 && Math.abs(dx) + Math.abs(dy) > 2) {
-    isDragging = true;
-    tgtTheta  -= dx * 0.007;
-    tgtPhi     = Math.max(0.18, Math.min(1.45, tgtPhi + dy * 0.005));
-    prevMouse  = {x:e.clientX, y:e.clientY};
-  }
-  const hit = getHit(e);
-  const tip = document.getElementById('tooltip');
-  const r   = chessRoot.getBoundingClientRect();
-  if (hit) {
-    hoveredEntry = hit;
-    tip.style.display = 'block';
-    tip.style.left = (e.clientX - r.left + 14) + 'px';
-    tip.style.top  = (e.clientY - r.top  - 10) + 'px';
-    tip.textContent = hit.label;
-    chessRoot.style.cursor = 'pointer';
-  } else {
-    hoveredEntry = null;
-    tip.style.display = 'none';
-    chessRoot.style.cursor = isDragging ? 'grabbing' : 'default';
-  }
-}
-function onMU() {}
-function onWH(e) { tgtRadius = Math.max(6, Math.min(22, tgtRadius + e.deltaY * 0.015)); }
-function onCL(e) {
-  if (isDragging) { isDragging = false; return; }
-  const hit = getHit(e);
-  if (hit) {
-    if (selectedEntry === hit) openPage(hit.page);
-    else selectEntry(hit);
-  } else {
-    deselectEntry();
-  }
-}
-function onResize() {
-  camera.aspect = chessRoot.clientWidth / chessRoot.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(chessRoot.clientWidth, chessRoot.clientHeight);
-}
-
-/* ── Selection (tint sprite material) ── */
-function selectEntry(entry) {
-  deselectEntry();
-  selectedEntry = entry;
-  entry.sprite.material.color.set(0x90eea0); // green selection tint
-  const lbl = document.getElementById('piece-label');
-  document.getElementById('pl-name').textContent = entry.label;
-  document.getElementById('pl-sub').textContent  =
-    ICONS[entry.type] + ' ' + TYPE_NAMES[entry.type].toUpperCase() +
-    ' · ' + (entry.isW ? 'WHITE' : 'BLACK');
-  lbl.style.display = 'block';
-  lbl.style.opacity = '0';
-  lbl.style.transition = 'opacity 0.28s';
-  setTimeout(() => lbl.style.opacity = '1', 10);
-}
-function deselectEntry() {
-  if (selectedEntry) selectedEntry.sprite.material.color.set(0xffffff);
-  selectedEntry = null;
-  document.getElementById('piece-label').style.display = 'none';
-}
-
-/* ── Pages ── */
-function openPage(pageId) {
-  const page = PAGES[pageId]; if (!page) return;
-  document.getElementById('page-bg-icon').textContent = page.icon;
-  document.getElementById('page-inner').innerHTML =
-    `<div class="page-title"><span>//</span> ${page.title}</div><hr class="page-rule">${page.render()}`;
-  const ov = document.getElementById('overlay');
-  ov.classList.add('active');
-  ov.scrollTop = 0;
-  deselectEntry();
-}
-function closeOverlay() { document.getElementById('overlay').classList.remove('active'); }
-
-/* ── Animation loop ── */
-function animate() {
-  requestAnimationFrame(animate);
-  animT      = Date.now() * 0.001;
-  camTheta  += (tgtTheta  - camTheta)  * 0.07;
-  camPhi    += (tgtPhi    - camPhi)    * 0.07;
-  camRadius += (tgtRadius - camRadius) * 0.07;
-  updateCam();
-
-  const BASE_Y     = 0.58;
-  const BASE_SCALE = 0.90;
-
-  pieceMeshes.forEach(entry => {
-    const { sprite } = entry;
-    const isSel = entry === selectedEntry;
-    const isHov = entry === hoveredEntry;
-
-    if (isSel) {
-      const ty = BASE_Y + 0.28 + Math.sin(animT * 2.4) * 0.07;
-      sprite.position.y += (ty - sprite.position.y) * 0.12;
-      const s = BASE_SCALE * 1.12;
-      sprite.scale.set(s, s, 1);
-    } else if (isHov) {
-      sprite.position.y += (BASE_Y + 0.11 - sprite.position.y) * 0.14;
-      const s = BASE_SCALE * 1.05;
-      sprite.scale.set(s, s, 1);
-    } else {
-      sprite.position.y += (BASE_Y - sprite.position.y) * 0.09;
-      sprite.scale.set(BASE_SCALE, BASE_SCALE, 1);
-    }
-  });
-
-  renderer.render(scene, camera);
-}
-
-/* ── Boot ── */
-async function initThree() {
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a0c);
-  scene.fog = new THREE.FogExp2(0x0a0a0c, 0.022);
-
-  const W = chessRoot.clientWidth, H = chessRoot.clientHeight;
-  camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
-  updateCam();
-
-  renderer = new THREE.WebGLRenderer({ canvas: chessCanvas, antialias: true });
-  renderer.setSize(W, H);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled  = true;
-  renderer.shadowMap.type     = THREE.PCFSoftShadowMap;
-  renderer.toneMapping        = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.10;
-
-  // Lighting
-  scene.add(new THREE.AmbientLight(0x1e1e2c, 5.5));
-
-  const key = new THREE.DirectionalLight(0xfff6e8, 2.0);
-  key.position.set(4, 14, 3);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.bias = -0.0004;
-  key.shadow.camera.near = 0.5; key.shadow.camera.far = 35;
-  key.shadow.camera.left = key.shadow.camera.bottom = -9;
-  key.shadow.camera.right = key.shadow.camera.top   =  9;
-  scene.add(key);
-
-  scene.add(Object.assign(new THREE.DirectionalLight(0xb8d8ff, 0.55), { position: new THREE.Vector3(-5, 6, -5) }));
-
-  const rim1 = new THREE.PointLight(0x4ade80, 0.50, 22); rim1.position.set(-5, 7, -6); scene.add(rim1);
-  const rim2 = new THREE.PointLight(0x4ade80, 0.22, 14); rim2.position.set( 6, 3,  6); scene.add(rim2);
-
-  // Build board first (no async needed)
-  buildBoard();
-
-  // Preload piece textures from Lichess CDN (canvas fallback built-in)
-  await loadPieceTextures();
-
-  // Use chess.js to get the exact position after move 22
-  const chess    = new Chess();
-  chess.load_pgn(GAME_PGN);
-  const allMoves = chess.history();
-  chess.reset();
-  for (let i = 0; i < 44; i++) chess.move(allMoves[i]);
-  buildPieces(chess);
-
-  raycaster = new THREE.Raycaster();
-  mouse     = new THREE.Vector2();
-
-  chessCanvas.addEventListener('mousedown', onMD);
-  chessCanvas.addEventListener('mousemove', onMM);
-  chessCanvas.addEventListener('mouseup',   onMU);
-  chessCanvas.addEventListener('click',     onCL);
-  chessCanvas.addEventListener('wheel',     onWH, { passive: true });
-  window.addEventListener('resize', onResize);
-  document.getElementById('back-btn').addEventListener('click', closeOverlay);
-
-  animate();
-}
-
-/* ═══════════════════════════════════════════════════
-   TERMINAL TYPING ENGINE
-═══════════════════════════════════════════════════ */
-const termBody   = document.getElementById('term-body');
+const termBox    = document.getElementById('term-box');
 const termCursor = document.getElementById('term-cursor');
 const sleep      = ms => new Promise(r => setTimeout(r, ms));
 
-function scrollTerm() { termBody.scrollTop = termBody.scrollHeight; }
-
-async function typeLine(text, cls, speed = 25) {
-  const span = document.createElement('span');
-  span.className = 'tl ' + cls;
-  termBody.insertBefore(span, termCursor);
-  scrollTerm();
-  for (const ch of text) {
-    span.textContent += ch;
-    scrollTerm();
-    await sleep(speed + Math.random() * 10);
-  }
-  await sleep(55);
-}
-
-function addBlank() {
-  const span = document.createElement('span');
-  span.className = 'tl blank';
-  termBody.insertBefore(span, termCursor);
-  scrollTerm();
-}
+const SCRIPT = [
+  { t: 'cmd',   s: 'chess-analysis --game "candidates-2014"' },
+  { t: 'p',     ms: 700 },
+  { t: 'out',   s: '# Caruana vs Aronian · FIDE Candidates 2014' },
+  { t: 'out',   s: '# 44 moves loaded · Result: 1-0' },
+  { t: 'b' },
+  { t: 'move',  s: ' 1.  e4          e5' },
+  { t: 'move',  s: ' 2.  Nf3         Nc6' },
+  { t: 'move',  s: ' 3.  Bb5         a6    (Ruy Lopez)' },
+  { t: 'move',  s: ' ...' },
+  { t: 'key',   s: '19.  Nf5!!  ★   gxf5   ← brilliant sacrifice' },
+  { t: 'move',  s: '20.  exf5        Bf6' },
+  { t: 'move',  s: '21.  Re1         Re8' },
+  { t: 'now',   s: '22.  Nd4  ◄     Nf8   ← critical position' },
+  { t: 'move',  s: ' ...' },
+  { t: 'key',   s: '44.  Bf5         1-0   ✓  Caruana wins!' },
+  { t: 'b' },
+  { t: 'quote', s: '  "This was my best game ever." — Fabiano Caruana' },
+  { t: 'b' },
+  { t: 'cmd',   s: '' },
+];
 
 async function runTerminal() {
-  await sleep(900);
-  for (const item of TERMINAL_SCRIPT) {
-    switch (item.t) {
-      case 'cmd':   await typeLine('$ ' + item.s, 'cmd',   28); break;
-      case 'out':   await typeLine(item.s,         'out',   22); break;
-      case 'hi':    await typeLine(item.s,         'hi',    16); break;
-      case 'quote': await typeLine(item.s,         'quote', 20); break;
-      case 'move':  await typeLine(item.s,         'move',  11); break;
-      case 'key':   await typeLine(item.s,         'key',   15); break;
-      case 'now':   await typeLine(item.s,         'now',   15); break;
-      case 'b':     addBlank(); await sleep(90);  break;
-      case 'p':     await sleep(item.ms);         break;
+  await sleep(700);
+  for (const item of SCRIPT) {
+    if (item.t === 'p') { await sleep(item.ms); continue; }
+    if (item.t === 'b') {
+      const el = document.createElement('div');
+      el.style.height = '0.4em';
+      termBox.insertBefore(el, termCursor);
+      continue;
     }
+    const el = document.createElement('div');
+    const classMap = {
+      cmd: 't-cmd', out: 't-out', move: 't-move',
+      key: 't-key', now: 't-now', quote: 't-quote',
+    };
+    el.className = classMap[item.t] || 't-out';
+    termBox.insertBefore(el, termCursor);
+
+    const prefix = item.t === 'cmd' ? '$ ' : '';
+    const text   = prefix + item.s;
+    const speed  = item.t === 'cmd' ? 32 : item.t === 'move' ? 10 : 18;
+
+    for (const ch of text) {
+      el.textContent += ch;
+      termBox.scrollTop = termBox.scrollHeight;
+      await sleep(speed + Math.random() * 8);
+    }
+    await sleep(35);
   }
 }
 
-/* ── Start everything ── */
-initThree();   // async — pieces appear once textures load
-runTerminal(); // starts typing immediately in parallel
-window.closeOverlay = closeOverlay;
+runTerminal();
 </script>
 </body>
 </html>

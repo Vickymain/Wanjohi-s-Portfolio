@@ -52,6 +52,15 @@ nav {
   color: var(--text);
   text-decoration: none;
   letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-pawn {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(0);
 }
 .nav-links {
   display: flex;
@@ -171,15 +180,77 @@ main {
   letter-spacing: -0.01em;
 }
 
-/* ── ABOUT ── */
-.about-text {
-  font-size: 13.5px;
-  color: var(--muted);
-  line-height: 2;
-  max-width: 580px;
+/* ── ABOUT ACCORDION ── */
+.np-heading {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
 }
-.about-text strong { color: var(--text); font-weight: 700; }
-.about-text p + p { margin-top: 14px; }
+.np-null  { color: var(--accent); }
+.np-dot   { color: var(--muted); font-weight: 400; }
+.np-sub   { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 20px; }
+
+.accordion { border: 1px solid var(--border); }
+.acc-item  { border-bottom: 1px solid var(--border); }
+.acc-item:last-child { border-bottom: none; }
+
+.acc-trigger {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 18px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  transition: background 0.12s;
+}
+.acc-trigger:hover { background: rgba(0,0,0,0.03); }
+
+.acc-arrow {
+  color: var(--accent);
+  font-size: 9px;
+  transition: transform 0.2s;
+  display: inline-block;
+  width: 14px;
+  flex-shrink: 0;
+}
+.acc-arrow.open { transform: rotate(90deg); }
+
+.acc-name    { font-weight: 700; min-width: 110px; }
+.acc-comment { font-size: 11.5px; color: var(--muted); }
+
+.acc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.32s ease;
+}
+.acc-body.open { max-height: 600px; }
+
+.acc-content {
+  padding: 18px 20px 22px 42px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.95;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+.acc-content strong { color: var(--text); font-weight: 700; }
+.acc-content p + p  { margin-top: 10px; }
+.acc-tag {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid rgba(139,111,74,0.35);
+  padding: 2px 8px;
+  margin: 6px 4px 0 0;
+  letter-spacing: 0.1em;
+}
 
 /* ── PROJECTS ── */
 .projects-grid {
@@ -260,7 +331,10 @@ footer {
 
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="#">victor.maina</a>
+    <a class="nav-logo" href="#">
+      <img src="images/pawn.png" alt="pawn" class="nav-pawn">
+      Home
+    </a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
@@ -274,7 +348,7 @@ footer {
 
   <!-- HERO -->
   <div class="hero">
-    <h1>Victor Maina<span class="cursor"></span></h1>
+    <h1>Victor Maina</h1>
     <p class="hero-sub">Software Engineer &amp; Chess Enthusiast</p>
 
     <div class="terminal" id="term-box">
@@ -289,22 +363,79 @@ footer {
 
   <!-- ABOUT -->
   <section class="section" id="about">
-    <h2>About</h2>
-    <div class="about-text">
-      <p>
-        I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>,
-        studying Computer Science at Maseno University since 2022.
-        I build clean, meaningful software — from full-stack web applications to AI-driven tools.
-      </p>
-      <p>
-        Outside of code, I'm a <strong>chess enthusiast</strong>. The game sharpens pattern
-        recognition and long-term planning — skills that transfer directly to engineering.
-        Currently ~1000 ELO on chess.com, with IM level as the long-term goal.
-      </p>
-      <p>
-        The terminal above replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong>
-        — widely considered one of the most brilliant games in modern chess history.
-      </p>
+    <div class="np-heading"><span class="np-null">null</span><span class="np-dot">.</span>about</div>
+    <p class="np-sub">// click any entry to expand</p>
+
+    <div class="accordion">
+
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-arrow">▶</span>
+          <span class="acc-name">about_me</span>
+          <span class="acc-comment">// software engineer · cs student</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-content">
+            <p>I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>, studying Computer Science at Maseno University since 2022. I build clean, meaningful software — from full-stack web apps to AI-driven tools.</p>
+            <p>I'm drawn to problems that sit at the intersection of performance and elegance. Whether it's a backend API or a pixel-perfect UI, I care about the craft.</p>
+            <p>The terminal on this page replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong> — widely considered one of the most brilliant games in modern chess history.</p>
+            <div style="margin-top:14px;">
+              <span class="acc-tag">JavaScript</span>
+              <span class="acc-tag">Python</span>
+              <span class="acc-tag">PHP</span>
+              <span class="acc-tag">React</span>
+              <span class="acc-tag">Node.js</span>
+              <span class="acc-tag">Chess ~1000 ELO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-arrow">▶</span>
+          <span class="acc-name">music</span>
+          <span class="acc-comment">// what i listen to</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-content">
+            <p>Music is a constant — it runs in the background whether I'm debugging at 2am or grinding chess puzzles. My taste swings between genres depending on the mood.</p>
+            <p>Heavy rotation: <strong>Afrobeat</strong>, <strong>Hip-hop</strong>, <strong>R&B</strong>, and the occasional lo-fi playlist when deep work needs a quiet soundtrack.</p>
+            <p>Artists I keep coming back to: Burna Boy, J. Cole, Kendrick Lamar, Wizkid, and a rotating cast of Kenyan artists I'm proud to rep.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-arrow">▶</span>
+          <span class="acc-name">anime</span>
+          <span class="acc-comment">// what i watch</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-content">
+            <p>Anime for me is storytelling taken seriously — the best shows have the same kind of strategic depth I love in chess and the same elegance I chase in code.</p>
+            <p>All-time favourites: <strong>Attack on Titan</strong>, <strong>Death Note</strong>, <strong>Fullmetal Alchemist: Brotherhood</strong>, <strong>Hunter x Hunter</strong>. Currently watching whatever's new.</p>
+            <p>Death Note in particular hits differently — the mind games between Light and L are pure chess energy translated to screen.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-arrow">▶</span>
+          <span class="acc-name">football</span>
+          <span class="acc-comment">// the beautiful game</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-content">
+            <p>Football and chess share the same soul — positional awareness, long-term planning, and knowing when to sacrifice something small for a bigger win.</p>
+            <p>I follow the <strong>Premier League</strong> closely. Big fan of how tactics have evolved — the modern pressing game is chess at 100km/h.</p>
+            <p>Also support the <strong>Kenyan national team</strong> (Harambee Stars). The journey is long but the belief is real.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -474,6 +605,14 @@ async function runTerminal() {
 }
 
 runTerminal();
+
+function toggleAcc(btn) {
+  const arrow = btn.querySelector('.acc-arrow');
+  const body  = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
 </script>
 </body>
 </html>

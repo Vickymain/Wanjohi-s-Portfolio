@@ -347,40 +347,58 @@ main {
 .exp-org  { font-size: 11.5px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px; }
 .exp-note { font-size: 12.5px; color: var(--muted); line-height: 1.75; }
 
-/* ── CONTACT ── */
-#map {
-  width: 100%;
-  height: 280px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-  z-index: 0;
+/* ── CONTACT CHAT ── */
+.chat-panel {
+  background: #1c1e20;
+  border-radius: 8px;
+  padding: 22px 20px 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  max-width: 540px;
 }
-.contact-location {
-  font-size: 14px;
-  color: var(--text);
-  margin-bottom: 24px;
-  letter-spacing: 0.02em;
+.chat-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 6px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
 }
-.contact-location a {
-  color: var(--text);
+.chat-row.visible { opacity: 1; transform: translateY(0); }
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  flex-shrink: 0;
+}
+.chat-spacer { width: 32px; flex-shrink: 0; }
+
+.chat-bubble {
+  background: #2c2f32;
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #d0d0c8;
+  line-height: 1.65;
+  max-width: 420px;
+}
+.chat-bubble a {
+  color: #39d98a;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.contact-find { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-.contact-links { display: flex; flex-direction: column; gap: 10px; }
-.contact-link {
-  font-size: 13px;
-  color: var(--text);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
+
+.chat-map-bubble {
+  width: 300px;
+  height: 190px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
 }
-.contact-link span { text-decoration: underline; text-underline-offset: 3px; }
-.contact-link:hover span { color: var(--accent); }
+#map { width: 100%; height: 100%; }
 
 /* ── FOOTER ── */
 footer {
@@ -595,21 +613,46 @@ footer {
   <section class="section" id="contact">
     <h2>Contact</h2>
 
-    <div id="map"></div>
+    <div class="chat-panel" id="chat-panel">
 
-    <p class="contact-location">I'm currently in <a href="https://www.google.com/maps/place/Nairobi" target="_blank" rel="noopener">Nairobi, Kenya</a> 📍</p>
+      <!-- Map card -->
+      <div class="chat-row">
+        <div class="chat-spacer"></div>
+        <div class="chat-map-bubble">
+          <div id="map"></div>
+        </div>
+      </div>
 
-    <p class="contact-find">Find me online:</p>
-    <div class="contact-links">
-      <a class="contact-link" href="mailto:wanjohi.vmaina@gmail.com">
-        <span>wanjohi.vmaina@gmail.com</span>
-      </a>
-      <a class="contact-link" href="https://github.com/Vickymain" target="_blank" rel="noopener">
-        I'm <span>@Vickymain on GitHub</span>
-      </a>
-      <a class="contact-link" href="https://chess.com" target="_blank" rel="noopener">
-        I'm on <span>chess.com</span> · ~1000 ELO
-      </a>
+      <!-- Location -->
+      <div class="chat-row">
+        <img src="images/profile.jpg" alt="" class="chat-avatar">
+        <div class="chat-bubble">I'm currently in <a href="https://www.google.com/maps/place/Nairobi" target="_blank" rel="noopener">Nairobi, Kenya</a> 📍</div>
+      </div>
+
+      <!-- Find me online -->
+      <div class="chat-row" style="margin-top:10px;">
+        <img src="images/profile.jpg" alt="" class="chat-avatar">
+        <div class="chat-bubble">Find me online:</div>
+      </div>
+
+      <!-- GitHub -->
+      <div class="chat-row">
+        <div class="chat-spacer"></div>
+        <div class="chat-bubble">I'm <a href="https://github.com/Vickymain" target="_blank" rel="noopener">@Vickymain on GitHub</a> 🐙</div>
+      </div>
+
+      <!-- Email -->
+      <div class="chat-row">
+        <div class="chat-spacer"></div>
+        <div class="chat-bubble"><a href="mailto:wanjohi.vmaina@gmail.com">wanjohi.vmaina@gmail.com</a> ✉️</div>
+      </div>
+
+      <!-- Chess -->
+      <div class="chat-row">
+        <div class="chat-spacer"></div>
+        <div class="chat-bubble">I'm on <a href="https://chess.com" target="_blank" rel="noopener">chess.com</a> · ~1000 ELO ♟</div>
+      </div>
+
     </div>
   </section>
 
@@ -678,7 +721,7 @@ async function runTerminal() {
 runTerminal();
 
 // Nairobi map
-const map = L.map('map', { zoomControl: false, scrollWheelZoom: false })
+const map = L.map('map', { zoomControl: false, scrollWheelZoom: false, dragging: false })
   .setView([-1.2921, 36.8219], 13);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -689,16 +732,29 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 const pinIcon = L.divIcon({
   className: '',
   html: `<div style="
-    width:52px;height:52px;border-radius:50%;
+    width:46px;height:46px;border-radius:50%;
     border:3px solid #39d98a;
     overflow:hidden;
-    box-shadow:0 2px 14px rgba(0,0,0,0.55);
+    box-shadow:0 2px 14px rgba(0,0,0,0.6);
   "><img src="images/profile.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top;"></div>`,
-  iconSize: [52, 52],
-  iconAnchor: [26, 26],
+  iconSize: [46, 46],
+  iconAnchor: [23, 23],
 });
-
 L.marker([-1.2921, 36.8219], { icon: pinIcon }).addTo(map);
+
+// Staggered chat entrance on scroll
+const chatRows = document.querySelectorAll('.chat-row');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      chatRows.forEach((row, i) => {
+        setTimeout(() => row.classList.add('visible'), i * 180);
+      });
+      observer.disconnect();
+    }
+  });
+}, { threshold: 0.2 });
+observer.observe(document.getElementById('chat-panel'));
 
 function toggleMore(btn) {
   const section = btn.nextElementSibling;

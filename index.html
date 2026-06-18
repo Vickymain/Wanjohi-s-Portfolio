@@ -119,6 +119,7 @@ main {
 .terminal::-webkit-scrollbar { display: none; }
 
 .t-cmd   { display: block; color: var(--term-g); }
+.t-hi    { display: block; color: #d4d0c4; font-weight: 700; }
 .t-out   { display: block; color: #596857; }
 .t-move  { display: block; color: #4a5a4a; }
 .t-key   { display: block; color: #f59e0b; }
@@ -425,10 +426,9 @@ const termCursor = document.getElementById('term-cursor');
 const sleep      = ms => new Promise(r => setTimeout(r, ms));
 
 const SCRIPT = [
-  { t: 'cmd',   s: 'chess-analysis --game "candidates-2014"' },
-  { t: 'p',     ms: 700 },
-  { t: 'out',   s: '# Caruana vs Aronian · FIDE Candidates 2014' },
-  { t: 'out',   s: '# 44 moves loaded · Result: 1-0' },
+  { t: 'hi',    s: 'My favourite game: Caruana vs Aronian, 2014 Candidates' },
+  { t: 'p',     ms: 600 },
+  { t: 'out',   s: '# 44 moves · Result: 1-0' },
   { t: 'b' },
   { t: 'move',  s: ' 1.  e4          e5' },
   { t: 'move',  s: ' 2.  Nf3         Nc6' },
@@ -440,10 +440,6 @@ const SCRIPT = [
   { t: 'now',   s: '22.  Nd4  ◄     Nf8   ← critical position' },
   { t: 'move',  s: ' ...' },
   { t: 'key',   s: '44.  Bf5         1-0   ✓  Caruana wins!' },
-  { t: 'b' },
-  { t: 'quote', s: '  "This was my best game ever." — Fabiano Caruana' },
-  { t: 'b' },
-  { t: 'cmd',   s: '' },
 ];
 
 async function runTerminal() {
@@ -458,7 +454,7 @@ async function runTerminal() {
     }
     const el = document.createElement('div');
     const classMap = {
-      cmd: 't-cmd', out: 't-out', move: 't-move',
+      cmd: 't-cmd', hi: 't-hi', out: 't-out', move: 't-move',
       key: 't-key', now: 't-now', quote: 't-quote',
     };
     el.className = classMap[item.t] || 't-out';

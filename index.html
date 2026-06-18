@@ -180,77 +180,119 @@ main {
   letter-spacing: -0.01em;
 }
 
-/* ── ABOUT ACCORDION ── */
-.np-heading {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  letter-spacing: -0.01em;
+/* ── NULL POINTER ABOUT ── */
+.np-panel {
+  background: #181a1b;
+  border: 1px solid rgba(57,217,138,0.18);
+  overflow: hidden;
 }
-.np-null  { color: var(--accent); }
-.np-dot   { color: var(--muted); font-weight: 400; }
-.np-sub   { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 20px; }
+.np-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(57,217,138,0.12);
+}
+.np-badge {
+  background: #39d98a;
+  color: #0a0c0a;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 14px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.np-bars {
+  flex: 1;
+  height: 26px;
+  margin-left: 14px;
+  background: repeating-linear-gradient(
+    to right,
+    #39d98a 0px, #39d98a 2px,
+    transparent 2px, transparent 7px
+  );
+  opacity: 0.65;
+}
+.np-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(57,217,138,0.10);
+}
+.np-nav-btn {
+  font-family: inherit;
+  font-size: 13px;
+  color: #39d98a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 11px 18px 11px 0;
+  margin-right: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+.np-nav-btn.active { opacity: 1; }
+.np-nav-btn:hover  { opacity: 0.9; }
 
-.accordion { border: 1px solid var(--border); }
-.acc-item  { border-bottom: 1px solid var(--border); }
-.acc-item:last-child { border-bottom: none; }
+.np-pane { display: none; padding: 22px 20px 26px; }
+.np-pane.active { display: block; }
 
-.acc-trigger {
+.np-text { font-size: 13px; color: #b8bcb4; line-height: 2; }
+.np-text strong { color: #39d98a; font-weight: 700; }
+.np-text p + p  { margin-top: 12px; }
+.np-hashtag {
+  display: inline-block;
+  font-size: 12px;
+  color: #39d98a;
+  margin: 8px 10px 0 0;
+  opacity: 0.75;
+}
+
+.np-cat-list { display: flex; flex-direction: column; }
+.np-cat-item { border-bottom: 1px solid rgba(57,217,138,0.08); }
+.np-cat-item:last-child { border-bottom: none; }
+.np-cat-trigger {
   width: 100%;
   background: none;
   border: none;
-  padding: 14px 18px;
+  padding: 12px 0;
   text-align: left;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
+  color: #39d98a;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--text);
-  transition: background 0.12s;
+  transition: opacity 0.12s;
+  letter-spacing: 0.03em;
 }
-.acc-trigger:hover { background: rgba(0,0,0,0.03); }
-
-.acc-arrow {
-  color: var(--accent);
+.np-cat-trigger:hover { opacity: 0.75; }
+.np-cat-arrow {
   font-size: 9px;
   transition: transform 0.2s;
   display: inline-block;
-  width: 14px;
-  flex-shrink: 0;
+  opacity: 0.7;
 }
-.acc-arrow.open { transform: rotate(90deg); }
-
-.acc-name    { font-weight: 700; min-width: 110px; }
-.acc-comment { font-size: 11.5px; color: var(--muted); }
-
-.acc-body {
+.np-cat-arrow.open { transform: rotate(90deg); }
+.np-cat-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.32s ease;
+  transition: max-height 0.28s ease;
 }
-.acc-body.open { max-height: 600px; }
-
-.acc-content {
-  padding: 18px 20px 22px 42px;
-  font-size: 13px;
-  color: var(--muted);
+.np-cat-body.open { max-height: 400px; }
+.np-cat-content {
+  padding: 10px 0 16px 22px;
+  font-size: 12.5px;
+  color: #7a8070;
   line-height: 1.95;
-  border-top: 1px solid var(--border);
-  background: var(--bg2);
+  border-top: 1px solid rgba(57,217,138,0.07);
 }
-.acc-content strong { color: var(--text); font-weight: 700; }
-.acc-content p + p  { margin-top: 10px; }
-.acc-tag {
-  display: inline-block;
-  font-size: 10px;
-  color: var(--accent);
-  border: 1px solid rgba(139,111,74,0.35);
-  padding: 2px 8px;
-  margin: 6px 4px 0 0;
-  letter-spacing: 0.1em;
-}
+.np-cat-content strong { color: #b8bcb4; }
 
 /* ── PROJECTS ── */
 .projects-grid {
@@ -363,76 +405,80 @@ footer {
 
   <!-- ABOUT -->
   <section class="section" id="about">
-    <div class="np-heading"><span class="np-null">null</span><span class="np-dot">.</span>about</div>
-    <p class="np-sub">// click any entry to expand</p>
+    <div class="np-panel">
 
-    <div class="accordion">
+      <!-- Badge + barcode bars -->
+      <div class="np-header">
+        <span class="np-badge">null pointer</span>
+        <div class="np-bars"></div>
+      </div>
 
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-arrow">▶</span>
-          <span class="acc-name">about_me</span>
-          <span class="acc-comment">// software engineer · cs student</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p>I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>, studying Computer Science at Maseno University since 2022. I build clean, meaningful software — from full-stack web apps to AI-driven tools.</p>
-            <p>I'm drawn to problems that sit at the intersection of performance and elegance. Whether it's a backend API or a pixel-perfect UI, I care about the craft.</p>
-            <p>The terminal on this page replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong> — widely considered one of the most brilliant games in modern chess history.</p>
-            <div style="margin-top:14px;">
-              <span class="acc-tag">JavaScript</span>
-              <span class="acc-tag">Python</span>
-              <span class="acc-tag">PHP</span>
-              <span class="acc-tag">React</span>
-              <span class="acc-tag">Node.js</span>
-              <span class="acc-tag">Chess ~1000 ELO</span>
+      <!-- Tab nav -->
+      <div class="np-nav">
+        <button class="np-nav-btn active" onclick="showPane('np-about', this)">About</button>
+        <button class="np-nav-btn" onclick="showPane('np-categories', this)">Categories</button>
+      </div>
+
+      <!-- About pane -->
+      <div class="np-pane active" id="np-about">
+        <div class="np-text">
+          <p>I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>, studying Computer Science at Maseno University since 2022. I build clean, meaningful software — from full-stack web apps to AI-driven tools.</p>
+          <p>I'm drawn to problems at the intersection of performance and elegance. Whether it's a backend API or a pixel-perfect UI, I care about the craft.</p>
+          <p>The terminal above replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong> — one of the most brilliant games in modern chess history.</p>
+          <div style="margin-top:16px;">
+            <span class="np-hashtag">#javascript</span>
+            <span class="np-hashtag">#python</span>
+            <span class="np-hashtag">#php</span>
+            <span class="np-hashtag">#react</span>
+            <span class="np-hashtag">#chess</span>
+            <span class="np-hashtag">#nairobi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories pane -->
+      <div class="np-pane" id="np-categories">
+        <div class="np-cat-list">
+
+          <div class="np-cat-item">
+            <button class="np-cat-trigger" onclick="toggleCat(this)">
+              <span class="np-cat-arrow">▶</span>
+              music
+            </button>
+            <div class="np-cat-body">
+              <div class="np-cat-content">
+                <p>Music is constant — whether debugging at 2am or grinding chess puzzles. Heavy rotation: <strong>Afrobeat, Hip-hop, R&amp;B</strong>, and lo-fi for deep work sessions.</p>
+                <p>Artists I keep coming back to: Burna Boy, J. Cole, Kendrick Lamar, Wizkid.</p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-arrow">▶</span>
-          <span class="acc-name">music</span>
-          <span class="acc-comment">// what i listen to</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p>Music is a constant — it runs in the background whether I'm debugging at 2am or grinding chess puzzles. My taste swings between genres depending on the mood.</p>
-            <p>Heavy rotation: <strong>Afrobeat</strong>, <strong>Hip-hop</strong>, <strong>R&B</strong>, and the occasional lo-fi playlist when deep work needs a quiet soundtrack.</p>
-            <p>Artists I keep coming back to: Burna Boy, J. Cole, Kendrick Lamar, Wizkid, and a rotating cast of Kenyan artists I'm proud to rep.</p>
+          <div class="np-cat-item">
+            <button class="np-cat-trigger" onclick="toggleCat(this)">
+              <span class="np-cat-arrow">▶</span>
+              anime
+            </button>
+            <div class="np-cat-body">
+              <div class="np-cat-content">
+                <p>Anime is storytelling taken seriously — the best shows share the same strategic depth as chess.</p>
+                <p>All-time favourites: <strong>Attack on Titan, Death Note, FMA: Brotherhood, Hunter x Hunter</strong>. The Light vs L mind games in Death Note are pure chess energy.</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-arrow">▶</span>
-          <span class="acc-name">anime</span>
-          <span class="acc-comment">// what i watch</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p>Anime for me is storytelling taken seriously — the best shows have the same kind of strategic depth I love in chess and the same elegance I chase in code.</p>
-            <p>All-time favourites: <strong>Attack on Titan</strong>, <strong>Death Note</strong>, <strong>Fullmetal Alchemist: Brotherhood</strong>, <strong>Hunter x Hunter</strong>. Currently watching whatever's new.</p>
-            <p>Death Note in particular hits differently — the mind games between Light and L are pure chess energy translated to screen.</p>
+          <div class="np-cat-item">
+            <button class="np-cat-trigger" onclick="toggleCat(this)">
+              <span class="np-cat-arrow">▶</span>
+              football
+            </button>
+            <div class="np-cat-body">
+              <div class="np-cat-content">
+                <p>Football and chess share the same soul — positional awareness, long-term planning, knowing when to sacrifice for a bigger win.</p>
+                <p>I follow the <strong>Premier League</strong> closely and back <strong>Harambee Stars</strong>. The journey is long but the belief is real.</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-arrow">▶</span>
-          <span class="acc-name">football</span>
-          <span class="acc-comment">// the beautiful game</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p>Football and chess share the same soul — positional awareness, long-term planning, and knowing when to sacrifice something small for a bigger win.</p>
-            <p>I follow the <strong>Premier League</strong> closely. Big fan of how tactics have evolved — the modern pressing game is chess at 100km/h.</p>
-            <p>Also support the <strong>Kenyan national team</strong> (Harambee Stars). The journey is long but the belief is real.</p>
-          </div>
         </div>
       </div>
 
@@ -606,8 +652,16 @@ async function runTerminal() {
 
 runTerminal();
 
-function toggleAcc(btn) {
-  const arrow = btn.querySelector('.acc-arrow');
+function showPane(id, btn) {
+  const panel = btn.closest('.np-panel');
+  panel.querySelectorAll('.np-nav-btn').forEach(b => b.classList.remove('active'));
+  panel.querySelectorAll('.np-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+function toggleCat(btn) {
+  const arrow = btn.querySelector('.np-cat-arrow');
   const body  = btn.nextElementSibling;
   const isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);

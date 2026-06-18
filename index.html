@@ -213,86 +213,107 @@ main {
   );
   opacity: 0.65;
 }
-.np-nav {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 0 20px;
-  border-bottom: 1px solid rgba(57,217,138,0.10);
+
+/* Bio: photo + text */
+.np-bio {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 28px;
+  padding: 28px 24px 24px;
+  align-items: start;
 }
-.np-nav-btn {
-  font-family: inherit;
+.np-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.np-bio-text {
   font-size: 13px;
+  color: #b8bcb4;
+  line-height: 2.05;
+}
+.np-bio-text p + p { margin-top: 14px; }
+.np-bio-text strong { color: #39d98a; font-weight: 700; }
+.np-bio-text a {
   color: #39d98a;
   text-decoration: underline;
   text-underline-offset: 3px;
-  padding: 11px 18px 11px 0;
-  margin-right: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  opacity: 0.55;
-  transition: opacity 0.15s;
 }
-.np-nav-btn.active { opacity: 1; }
-.np-nav-btn:hover  { opacity: 0.9; }
 
-.np-pane { display: none; padding: 22px 20px 26px; }
-.np-pane.active { display: block; }
+/* Divider */
+.np-divider {
+  height: 1px;
+  background: rgba(57,217,138,0.10);
+  margin: 0 24px;
+}
 
-.np-text { font-size: 13px; color: #b8bcb4; line-height: 2; }
-.np-text strong { color: #39d98a; font-weight: 700; }
-.np-text p + p  { margin-top: 12px; }
-.np-hashtag {
-  display: inline-block;
-  font-size: 12px;
+/* Curiosities */
+.np-curiosities { padding: 22px 24px 28px; }
+.np-curiosity-intro {
+  font-size: 13px;
+  color: #8a9080;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.np-dash-list { list-style: none; }
+.np-dash-list > li { margin-bottom: 18px; }
+.np-dash-top {
+  font-size: 13px;
   color: #39d98a;
-  margin: 8px 10px 0 0;
-  opacity: 0.75;
+  margin-bottom: 6px;
 }
+.np-dash-top::before { content: '- '; }
 
-.np-cat-list { display: flex; flex-direction: column; }
-.np-cat-item { border-bottom: 1px solid rgba(57,217,138,0.08); }
-.np-cat-item:last-child { border-bottom: none; }
-.np-cat-trigger {
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 12px 0;
-  text-align: left;
-  cursor: pointer;
+.np-dash-sub { list-style: none; padding-left: 18px; }
+.np-dash-sub li {
+  font-size: 13px;
+  color: #6a7268;
+  line-height: 1.85;
+}
+.np-dash-sub li::before { content: '- '; color: #39d98a; opacity: 0.5; }
+
+/* More link */
+.np-more-wrap { margin-top: 6px; }
+.np-more-btn {
   font-family: inherit;
   font-size: 13px;
   color: #39d98a;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: opacity 0.12s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
   letter-spacing: 0.03em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
 }
-.np-cat-trigger:hover { opacity: 0.75; }
-.np-cat-arrow {
-  font-size: 9px;
-  transition: transform 0.2s;
-  display: inline-block;
-  opacity: 0.7;
-}
-.np-cat-arrow.open { transform: rotate(90deg); }
-.np-cat-body {
+.np-more-btn:hover { opacity: 1; }
+
+.np-more-section {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.28s ease;
+  transition: max-height 0.35s ease;
 }
-.np-cat-body.open { max-height: 400px; }
-.np-cat-content {
-  padding: 10px 0 16px 22px;
-  font-size: 12.5px;
-  color: #7a8070;
-  line-height: 1.95;
-  border-top: 1px solid rgba(57,217,138,0.07);
+.np-more-section.open { max-height: 600px; }
+.np-more-content {
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid rgba(57,217,138,0.09);
+  font-size: 13px;
+  color: #6a7268;
+  line-height: 2;
 }
-.np-cat-content strong { color: #b8bcb4; }
+.np-more-content strong { color: #b8bcb4; }
+.np-more-content p + p  { margin-top: 12px; }
+
+@media (max-width: 600px) {
+  .np-bio { grid-template-columns: 1fr; gap: 16px; }
+  .np-photo { width: 140px; aspect-ratio: 1/1; }
+}
 
 /* ── PROJECTS ── */
 .projects-grid {
@@ -413,72 +434,63 @@ footer {
         <div class="np-bars"></div>
       </div>
 
-      <!-- Tab nav -->
-      <div class="np-nav">
-        <button class="np-nav-btn active" onclick="showPane('np-about', this)">About</button>
-        <button class="np-nav-btn" onclick="showPane('np-categories', this)">Categories</button>
-      </div>
-
-      <!-- About pane -->
-      <div class="np-pane active" id="np-about">
-        <div class="np-text">
-          <p>I'm a <strong>software engineer</strong> based in <strong>Nairobi, Kenya</strong>, studying Computer Science at Maseno University since 2022. I build clean, meaningful software — from full-stack web apps to AI-driven tools.</p>
-          <p>I'm drawn to problems at the intersection of performance and elegance. Whether it's a backend API or a pixel-perfect UI, I care about the craft.</p>
-          <p>The terminal above replays <strong>Caruana vs Aronian, FIDE Candidates 2014</strong> — one of the most brilliant games in modern chess history.</p>
-          <div style="margin-top:16px;">
-            <span class="np-hashtag">#javascript</span>
-            <span class="np-hashtag">#python</span>
-            <span class="np-hashtag">#php</span>
-            <span class="np-hashtag">#react</span>
-            <span class="np-hashtag">#chess</span>
-            <span class="np-hashtag">#nairobi</span>
-          </div>
+      <!-- Photo + bio -->
+      <div class="np-bio">
+        <img src="images/profile.jpg" alt="Victor Maina" class="np-photo">
+        <div class="np-bio-text">
+          <p>I'm <strong>Victor Maina</strong>, a software engineer based in <strong>Nairobi, Kenya</strong>, studying Computer Science at Maseno University since 2022.</p>
+          <p>I build clean, meaningful software — from full-stack web applications to AI-driven tools. I'm drawn to problems at the intersection of performance and elegance; whether it's a backend API or a pixel-perfect UI, I care about the craft.</p>
+          <p>Outside of code I'm a <strong>chess player</strong>. The terminal on this page replays Caruana vs Aronian, FIDE Candidates 2014 — one of the most brilliant games in modern chess history.</p>
+          <p>You can reach me at <a href="mailto:wanjohi.vmaina@gmail.com">wanjohi.vmaina@gmail.com</a>.</p>
         </div>
       </div>
 
-      <!-- Categories pane -->
-      <div class="np-pane" id="np-categories">
-        <div class="np-cat-list">
+      <!-- Divider -->
+      <div class="np-divider"></div>
 
-          <div class="np-cat-item">
-            <button class="np-cat-trigger" onclick="toggleCat(this)">
-              <span class="np-cat-arrow">▶</span>
-              music
-            </button>
-            <div class="np-cat-body">
-              <div class="np-cat-content">
-                <p>Music is constant — whether debugging at 2am or grinding chess puzzles. Heavy rotation: <strong>Afrobeat, Hip-hop, R&amp;B</strong>, and lo-fi for deep work sessions.</p>
-                <p>Artists I keep coming back to: Burna Boy, J. Cole, Kendrick Lamar, Wizkid.</p>
-              </div>
+      <!-- Curiosities -->
+      <div class="np-curiosities">
+        <p class="np-curiosity-intro">Here are, for curiosity's sake, some other things I enjoy:</p>
+
+        <ul class="np-dash-list">
+          <li>
+            <div class="np-dash-top">Music</div>
+            <ul class="np-dash-sub">
+              <li>Burna Boy</li>
+              <li>J. Cole</li>
+              <li>Kendrick Lamar</li>
+              <li>Wizkid</li>
+              <li>Kenyan artists — always</li>
+            </ul>
+          </li>
+          <li>
+            <div class="np-dash-top">Anime</div>
+            <ul class="np-dash-sub">
+              <li>Attack on Titan</li>
+              <li>Death Note</li>
+              <li>Fullmetal Alchemist: Brotherhood</li>
+              <li>Hunter x Hunter</li>
+            </ul>
+          </li>
+          <li>
+            <div class="np-dash-top">Football</div>
+            <ul class="np-dash-sub">
+              <li>Premier League</li>
+              <li>Harambee Stars</li>
+              <li>Tactical analysis — the chess of the pitch</li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="np-more-wrap">
+          <button class="np-more-btn" onclick="toggleMore(this)">Read more about me →</button>
+          <div class="np-more-section">
+            <div class="np-more-content">
+              <p>I started coding seriously in 2022 when I joined Maseno University. Before writing a single line of production code I spent months reading, breaking things, and building side projects just to understand how things worked.</p>
+              <p>Chess entered my life around the same time. The parallel was immediate — both reward <strong>pattern recognition</strong>, long-term thinking, and knowing when to take a risk. I went from zero to ~1000 ELO and I'm not stopping.</p>
+              <p>Long term I want to build things that matter — software that solves real problems for people in <strong>Africa and beyond</strong>. The stack will keep changing. The mission won't.</p>
             </div>
           </div>
-
-          <div class="np-cat-item">
-            <button class="np-cat-trigger" onclick="toggleCat(this)">
-              <span class="np-cat-arrow">▶</span>
-              anime
-            </button>
-            <div class="np-cat-body">
-              <div class="np-cat-content">
-                <p>Anime is storytelling taken seriously — the best shows share the same strategic depth as chess.</p>
-                <p>All-time favourites: <strong>Attack on Titan, Death Note, FMA: Brotherhood, Hunter x Hunter</strong>. The Light vs L mind games in Death Note are pure chess energy.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="np-cat-item">
-            <button class="np-cat-trigger" onclick="toggleCat(this)">
-              <span class="np-cat-arrow">▶</span>
-              football
-            </button>
-            <div class="np-cat-body">
-              <div class="np-cat-content">
-                <p>Football and chess share the same soul — positional awareness, long-term planning, knowing when to sacrifice for a bigger win.</p>
-                <p>I follow the <strong>Premier League</strong> closely and back <strong>Harambee Stars</strong>. The journey is long but the belief is real.</p>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -652,20 +664,11 @@ async function runTerminal() {
 
 runTerminal();
 
-function showPane(id, btn) {
-  const panel = btn.closest('.np-panel');
-  panel.querySelectorAll('.np-nav-btn').forEach(b => b.classList.remove('active'));
-  panel.querySelectorAll('.np-pane').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById(id).classList.add('active');
-}
-
-function toggleCat(btn) {
-  const arrow = btn.querySelector('.np-cat-arrow');
-  const body  = btn.nextElementSibling;
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  arrow.classList.toggle('open', !isOpen);
+function toggleMore(btn) {
+  const section = btn.nextElementSibling;
+  const isOpen  = section.classList.contains('open');
+  section.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? 'Read more about me →' : 'Show less ↑';
 }
 </script>
 </body>

@@ -6,8 +6,6 @@
 <title>Victor Maina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -391,15 +389,6 @@ main {
   text-underline-offset: 3px;
 }
 
-.chat-map-bubble {
-  width: 300px;
-  height: 190px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.07);
-}
-#map { width: 100%; height: 100%; }
-
 /* ── FOOTER ── */
 footer {
   border-top: 1px solid var(--border);
@@ -597,14 +586,6 @@ footer {
 
     <div class="chat-panel" id="chat-panel">
 
-      <!-- Map card -->
-      <div class="chat-row">
-        <div class="chat-spacer"></div>
-        <div class="chat-map-bubble">
-          <div id="map"></div>
-        </div>
-      </div>
-
       <!-- Location -->
       <div class="chat-row">
         <img src="images/profile.jpg" alt="" class="chat-avatar">
@@ -708,28 +689,6 @@ async function runTerminal() {
 }
 
 runTerminal();
-
-// Nairobi map
-const map = L.map('map', { zoomControl: false, scrollWheelZoom: false, dragging: false })
-  .setView([-1.2921, 36.8219], 13);
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-  maxZoom: 19,
-}).addTo(map);
-
-const pinIcon = L.divIcon({
-  className: '',
-  html: `<div style="
-    width:46px;height:46px;border-radius:50%;
-    border:3px solid #39d98a;
-    overflow:hidden;
-    box-shadow:0 2px 14px rgba(0,0,0,0.6);
-  "><img src="images/profile.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top;"></div>`,
-  iconSize: [46, 46],
-  iconAnchor: [23, 23],
-});
-L.marker([-1.2921, 36.8219], { icon: pinIcon }).addTo(map);
 
 // Staggered chat entrance on scroll
 const chatRows = document.querySelectorAll('.chat-row');
